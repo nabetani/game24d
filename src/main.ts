@@ -11,6 +11,13 @@ const depth = {
   stars: 10,
 }
 
+const divmod = (n: number, d: number): { q: number, r: number } => {
+  const q = Math.floor(n / d)
+  const r = n - q * d
+  return { q: q, r: r }
+}
+
+
 export class Main extends BaseScene {
   prevTick: number = getTickSec()
   world: World = new World()
@@ -23,31 +30,33 @@ export class Main extends BaseScene {
     this.load.image("bg", `assets/bg.webp`);
   }
   create() {
-    const { width, height } = this.canvas();
     this.world.init()
     this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
     for (const xy of range(0, 9)) {
-      const ix = xy % 3 - 1
-      const iy = (xy - (ix + 1)) / 3 - 1
-      const o = this.add.image(ix * 512, iy * 900, "bg")
-      o.setData("pos", { x: ix, y: iy })
+      const o = this.add.image(0, 0, "bg")
       this.bgs.push(o)
     }
   }
   updateBG() {
-    for (const bg of this.bgs) {
-      const { x, y } = bg.getData("pos")
-      const wx = x * 512 - this.world.player.x
-      const wy = y * 900 - this.world.player.y
+    const w = 900
+    const icx = Math.floor(this.world.player.x / w + 0.5)
+    const icy = Math.floor(this.world.player.y / w + 0.5)
+    const { width, height } = this.canvas();
+    this.bgs.forEach((bg, index) => {
+      const qr = divmod(index, 3)
+      const x = qr.r + icx - 1
+      const y = qr.q + icy - 1
+      const wx = x * w - this.world.player.x
+      const wy = y * w - this.world.player.y
       const t = -(this.world.player.d + Math.PI / 2)
       const c = Math.cos(t)
       const s = Math.sin(t)
       const gx = c * wx - s * wy
       const gy = s * wx + c * wy
-      bg.setPosition(gx + 512 / 2, gy + 900 / 2)
+      bg.setPosition(gx + width / 2, gy + height / 2)
       bg.setRotation(t)
-    }
+    })
   }
 
   update() {
