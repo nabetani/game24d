@@ -33,22 +33,26 @@ export class Main extends BaseScene {
     this.world.init()
     this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
-    for (const xy of range(0, 9)) {
+    for (const xy of range(0, 9 * 6)) {
       const o = this.add.image(0, 0, "bg")
       this.bgs.push(o)
     }
   }
   updateBG() {
     const w = 900
-    const icx = Math.floor(this.world.player.x / w + 0.5)
-    const icy = Math.floor(this.world.player.y / w + 0.5)
     const { width, height } = this.canvas();
     this.bgs.forEach((bg, index) => {
-      const qr = divmod(index, 3)
+      const qr0 = divmod(index, 9)
+      const z = qr0.q
+      const px = this.world.player.x * (1.4 ** -z)
+      const py = this.world.player.y * (1.4 ** -z)
+      const icx = Math.floor(px / w + 0.5)
+      const icy = Math.floor(py / w + 0.5)
+      const qr = divmod(qr0.r, 3)
       const x = qr.r + icx - 1
       const y = qr.q + icy - 1
-      const wx = x * w - this.world.player.x
-      const wy = y * w - this.world.player.y
+      const wx = x * w - px
+      const wy = y * w - py
       const t = -(this.world.player.d + Math.PI / 2)
       const c = Math.cos(t)
       const s = Math.sin(t)
@@ -56,6 +60,7 @@ export class Main extends BaseScene {
       const gy = s * wx + c * wy
       bg.setPosition(gx + width / 2, gy + height / 2)
       bg.setRotation(t)
+      bg.setDepth(depth.stars - z)
     })
   }
 
