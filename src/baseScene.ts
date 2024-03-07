@@ -6,3 +6,9 @@ export class BaseScene extends Phaser.Scene {
     return this.sys.game.canvas
   }
 }
+
+export function* range(start: integer, end: integer) {
+  for (let i = start; i < end; i++) {
+    yield i;
+  }
+}
