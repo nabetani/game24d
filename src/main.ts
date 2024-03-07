@@ -27,14 +27,16 @@ export class Main extends BaseScene {
     super("Main")
   }
   preload() {
-    this.load.image("bg", `assets/bg.webp`);
+    for (const d of range(0, 6)) {
+      this.load.image(`bg${d}`, `assets/bg${d}.webp`);
+    }
   }
   create() {
     this.world.init()
     this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
-    for (const xy of range(0, 9 * 6)) {
-      const o = this.add.image(0, 0, "bg")
+    for (const ix of range(0, 9 * 6)) {
+      const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
   }
@@ -44,8 +46,8 @@ export class Main extends BaseScene {
     this.bgs.forEach((bg, index) => {
       const qr0 = divmod(index, 9)
       const z = qr0.q
-      const px = this.world.player.x * (1.4 ** -z)
-      const py = this.world.player.y * (1.4 ** -z)
+      const px = this.world.player.x * (1.2 ** -z)
+      const py = this.world.player.y * (1.2 ** -z)
       const icx = Math.floor(px / w + 0.5)
       const icy = Math.floor(py / w + 0.5)
       const qr = divmod(qr0.r, 3)
@@ -67,9 +69,9 @@ export class Main extends BaseScene {
   update() {
     const dt = getTickSec() - this.prevTick
     if (this.cursorInput?.right.isDown) {
-      this.world.player.d += 0.01
+      this.world.player.d += 0.1
     } else if (this.cursorInput?.left.isDown) {
-      this.world.player.d -= 0.01
+      this.world.player.d -= 0.1
     }
     this.world.update(dt)
     this.updateBG()
