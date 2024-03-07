@@ -9,6 +9,7 @@ const getTickSec = (): number => {
 const depth = {
   bg: 0,
   stars: 10,
+  player: 20,
 }
 
 const divmod = (n: number, d: number): { q: number, r: number } => {
@@ -17,12 +18,12 @@ const divmod = (n: number, d: number): { q: number, r: number } => {
   return { q: q, r: r }
 }
 
-
 export class Main extends BaseScene {
   prevTick: number = getTickSec()
   world: World = new World()
   bgs: Phaser.GameObjects.Image[] = []
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
+  player: Phaser.GameObjects.Sprite | null = null
   constructor() {
     super("Main")
   }
@@ -30,8 +31,10 @@ export class Main extends BaseScene {
     for (const d of range(0, 6)) {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
+    this.load.image("player", "assets/player.webp");
   }
   create() {
+    const { width, height } = this.canvas();
     this.world.init()
     this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
@@ -39,6 +42,7 @@ export class Main extends BaseScene {
       const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
+    this.player = this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5);
   }
   updateBG() {
     const w = 900

@@ -45,7 +45,6 @@ export class World {
   player: DPos = new DPos(0, 0, Math.PI / 2)
   update(dt: number) {
     this.player.move(dt * 200)
-    console.log(this.player)
   }
   init() {
   }
