@@ -8,6 +8,9 @@ export class XY {
     this.x = x
     this.y = y
   }
+  static rt(r: number, t: number): XY {
+    return new XY(r * Math.cos(t), r * Math.sin(t));
+  }
   mulAdd(o: XY, s: number): XY {
     return new XY(this.x + o.x * s, this.y + o.y * s)
   }
@@ -23,6 +26,8 @@ export class XY {
 export class Mobj {
   p: XY = new XY(0, 0)
   v: XY = new XY(0, 0) // pix / s
+  a: XY = new XY(0, 0) // pix / s**2
+  ar: number = 0
   r: number = 0 // rad
   vr: number = 0 // rad / s
   id: string = Mobj.newID()
@@ -35,8 +40,15 @@ export class Mobj {
   }
   get x(): number { return this.p.x }
   get y(): number { return this.p.y }
+  static forget: number = 0.9
   dev(dt: number) {
+    this.a.x *= Mobj.forget
+    this.a.y *= Mobj.forget
+    this.v = this.v.mulAdd(this.a, dt)
     this.p = this.p.mulAdd(this.v, dt)
+
+    this.ar *= Mobj.forget
+    this.vr += this.ar * dt
     this.r += this.vr * dt
   }
 }
@@ -55,9 +67,6 @@ export class World {
     }
   }
   init() {
-    this.player.vr = 0.1
-    this.player.v.x = 10
-    this.player.v.y = 20
   }
   charge(gunId: integer) {
     this.gunCharge[gunId] = (this.gunCharge[gunId] || 0) + 1;
@@ -67,9 +76,12 @@ export class World {
     this.gunCharge[gunId] = 0
     const b = new Bullet()
     b.p = this.player.p.dup()
-    b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 65)
+    b.p.incByDir(this.player.r + 0.4 * [-1, 1][gunId], 65)
     b.v = this.player.v.dup()
     b.v.incByDir(this.player.r, 200)
+
+    this.player.ar = [-1, 1][gunId] * 1
+    this.player.a = XY.rt(-200, this.player.r)
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
