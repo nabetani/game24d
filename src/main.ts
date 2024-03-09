@@ -43,6 +43,13 @@ export class Main extends BaseScene {
       this.bgs.push(o)
     }
     this.player = this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5);
+    {
+      const kb = this.input!.keyboard!
+      kb.on('keydown-RIGHT', () => this.world.inputDown(0));
+      kb.on('keydown-LEFT', () => this.world.inputDown(1));
+      kb.on('keyup-RIGHT', () => this.world.inputUp(0));
+      kb.on('keyup-LEFT', () => this.world.inputUp(1));
+    }
   }
   updateBG() {
     const w = 900
@@ -69,18 +76,29 @@ export class Main extends BaseScene {
       bg.setDepth(depth.stars - z)
     })
   }
+  upudateObjcts() {
+    const p = this.world.player.p
+    const { width, height } = this.canvas()
+    const t = -(this.world.player.r + Math.PI / 2)
+    const c = Math.cos(t)
+    const s = Math.sin(t)
+    for (const b of this.world.bullets) {
+      const wx = b.x - p.x
+      const wy = b.y - p.y
+      const id = b.id
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id)
+      const gx = c * wx - s * wy
+      const gy = s * wx + c * wy
+      const sp = o as Phaser.GameObjects.Sprite
+      sp.setPosition(gx + width / 2, gy + height / 2)
+    }
+  }
 
   update() {
     const dt = getTickSec() - this.prevTick
-    if (this.cursorInput?.right.isDown) {
-      this.world.player.vr += 0.1
-    } else if (this.cursorInput?.left.isDown) {
-      this.world.player.vr -= 0.1
-    } else if (this.cursorInput?.up.isDown) {
-      this.world.player.v.incByDir(this.world.player.r, 1)
-    }
     this.world.update(dt)
     this.updateBG()
+    this.upudateObjcts()
     this.prevTick += dt
   }
 }
