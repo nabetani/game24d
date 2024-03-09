@@ -1,50 +1,42 @@
 import { range } from './baseScene';
 
-export class Pos {
+// x と y
+export class XY {
   x: number
   y: number
   constructor(x: number, y: number) {
     this.x = x
     this.y = y
   }
-}
-
-export class DPos {
-  x: number
-  y: number
-  d: number // rad
-  constructor(x: number, y: number, d: number) {
-    this.x = x
-    this.y = y
-    this.d = d
+  mulAdd(o: XY, s: number): XY {
+    return new XY(this.x + o.x * s, this.y + o.y * s)
   }
-  add(dx: number, dy: number) {
-    this.x += dx
-    this.y += dy
-  }
-  move(r: number) {
-    const dx = r * Math.cos(this.d)
-    const dy = r * Math.sin(this.d)
-    this.add(dx, dy)
+  incByDir(dir: number, s: number) {
+    this.x += Math.cos(dir) * s
+    this.y += Math.sin(dir) * s
   }
 }
 
 export class Mobj {
-  dpos: DPos
-  v: number
-  constructor(dpos: DPos, v: number) {
-    this.dpos = dpos
-    this.v = v
+  p: XY = new XY(0, 0)
+  v: XY = new XY(0, 0) // pix / s
+  r: number = 0 // rad
+  vr: number = 0 // rad / s
+  static zero(): Mobj {
+    return new Mobj()
   }
+  get x(): number { return this.p.x }
+  get y(): number { return this.p.y }
   dev(dt: number) {
-    this.dpos.move(this.v * dt)
+    this.p = this.p.mulAdd(this.v, dt)
+    this.r += this.vr * dt
   }
 }
 
 export class World {
-  player: DPos = new DPos(0, 0, Math.PI / 2)
+  player: Mobj = Mobj.zero()
   update(dt: number) {
-    this.player.move(dt * 200)
+    this.player.dev(dt)
   }
   init() {
   }

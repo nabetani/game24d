@@ -59,7 +59,7 @@ export class Main extends BaseScene {
       const y = qr.q + icy - 1
       const wx = x * w - px
       const wy = y * w - py
-      const t = -(this.world.player.d + Math.PI / 2)
+      const t = -(this.world.player.r + Math.PI / 2)
       const c = Math.cos(t)
       const s = Math.sin(t)
       const gx = c * wx - s * wy
@@ -73,9 +73,11 @@ export class Main extends BaseScene {
   update() {
     const dt = getTickSec() - this.prevTick
     if (this.cursorInput?.right.isDown) {
-      this.world.player.d += 0.1
+      this.world.player.vr += 0.1
     } else if (this.cursorInput?.left.isDown) {
-      this.world.player.d -= 0.1
+      this.world.player.vr -= 0.1
+    } else if (this.cursorInput?.up.isDown) {
+      this.world.player.v.incByDir(this.world.player.r, 1)
     }
     this.world.update(dt)
     this.updateBG()
