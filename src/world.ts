@@ -67,8 +67,9 @@ export class World {
     this.gunCharge[gunId] = 0
     const b = new Bullet()
     b.p = this.player.p.dup()
+    b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 65)
     b.v = this.player.v.dup()
-    b.v.incByDir(this.player.r, 50)
+    b.v.incByDir(this.player.r, 200)
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
