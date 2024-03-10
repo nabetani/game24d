@@ -86,6 +86,16 @@ export class Main extends BaseScene {
     const goalPos = this.gpos(c, s, this.world.goal.xy)
     const angle = t * 180 / Math.PI
     this.goal.setPosition(goalPos.x, goalPos.y).setAngle(angle);
+    {
+      const dir = Math.atan2(goalPos.y - height / 2, goalPos.x - width / 2)
+      const id = "arrow";
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id)
+      const sp = o as Phaser.GameObjects.Sprite
+      const ar = 200
+      const ax = Math.cos(dir) * ar + width / 2
+      const ay = Math.sin(dir) * ar + height / 2
+      sp.setPosition(ax, ay).setAngle(90 + dir * (180 / Math.PI))
+    }
   }
   gpos(c: number, s: number, b: XY): XY {
     const p = this.world.player.p
