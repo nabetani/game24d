@@ -51,6 +51,8 @@ export class Main extends BaseScene {
   world: World = new World()
   bgs: Phaser.GameObjects.Image[] = []
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
+  objIDs: Set<string> = new Set<string>();
+
   get player(): Phaser.GameObjects.Sprite {
     return this.spriteByName("player");
   }
@@ -160,13 +162,21 @@ export class Main extends BaseScene {
     const t = -(this.world.player.r + Math.PI / 2)
     const c = Math.cos(t)
     const s = Math.sin(t)
+    const objIDs = new Set<string>();
     for (const b of this.world.bullets) {
       const g = this.gpos(c, s, b.p)
       const id = b.id
       const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id)
       const sp = o as Phaser.GameObjects.Sprite
+      objIDs.add(id);
+      this.objIDs.delete(id);
       sp.setPosition(g.x, g.y);
     }
+    this.objIDs.forEach(id => {
+      this.spriteByName(id).destroy()
+    })
+    this.objIDs = objIDs;
+    console.log("this.sys.displayList.length:", this.sys.displayList.length)
   }
 
   dispDist(): number {

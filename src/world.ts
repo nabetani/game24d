@@ -68,9 +68,14 @@ export class World {
   bullets: Bullet[] = []
   update(dt: number) {
     this.player.dev(dt)
+    const bullets: Bullet[] = []
     for (const b of this.bullets) {
       b.dev(dt)
+      if (this.player.p.dist(b.p) < 900) {
+        bullets.push(b)
+      }
     }
+    this.bullets = bullets
   }
   init() {
   }
