@@ -67,6 +67,7 @@ export class Main extends BaseScene {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
     this.load.image("player", "assets/player.webp");
+    this.load.image("arrow", "assets/arrow.webp");
     this.load.image("goal", "assets/goal.webp");
   }
   addTexts() {
@@ -138,9 +139,9 @@ export class Main extends BaseScene {
     {
       const dir = Math.atan2(goalPos.y - height / 2, goalPos.x - width / 2)
       const id = "arrow";
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id).setDepth(depth.bullet);
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrow").setScale(0.5).setName(id).setDepth(depth.bullet);
       const sp = o as Phaser.GameObjects.Sprite
-      const ar = 200
+      const ar = 230
       const ax = Math.cos(dir) * ar + width / 2
       const ay = Math.sin(dir) * ar + height / 2
       sp.setPosition(ax, ay).setAngle(90 + dir * (180 / Math.PI))
