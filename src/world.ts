@@ -57,7 +57,7 @@ type Bullet = Mobj
 const Bullet = Mobj
 
 export class World {
-  get goal() { return { rad: 120, xy: new XY(200, 0) } }
+  get goal() { return { rad: 120, xy: new XY(400, 0) } }
   player: Mobj = Mobj.zero()
   gunCharge: number[] = []
   bullets: Bullet[] = []
@@ -77,12 +77,12 @@ export class World {
     this.gunCharge[gunId] = 0
     const b = new Bullet()
     b.p = this.player.p.dup()
-    b.p.incByDir(this.player.r + 0.4 * [-1, 1][gunId], 65)
+    b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 65)
     b.v = this.player.v.dup()
     b.v.incByDir(this.player.r, 200)
 
-    this.player.ar = [-1, 1][gunId] * 1
-    this.player.a = XY.rt(-200, this.player.r)
+    this.player.ar += [1, -1][gunId] * 1
+    this.player.a.incByDir(this.player.r, -200)
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
