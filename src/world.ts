@@ -87,7 +87,7 @@ export class World {
     b.v.incByDir(this.player.r, 200)
 
     this.player.ar += [1, -1][gunId] * 1
-    this.player.a.incByDir(this.player.r, -200)
+    this.player.a.incByDir(this.player.r, -30)
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {

@@ -11,6 +11,7 @@ const depth = {
   stars: 10,
   goal: 20,
   player: 100,
+  bullet: 100,
   text: 200,
 }
 
@@ -21,6 +22,9 @@ const divmod = (n: number, d: number): { q: number, r: number } => {
 }
 
 const stringizeDist = (d: number): string => {
+  if (d <= 0) {
+    return "0"
+  }
   const p = Math.max(0, Math.log10(d))
   if (5.999 < p) { return "測定不能" }
   const n = Math.ceil(p);
@@ -67,13 +71,13 @@ export class Main extends BaseScene {
     const style = {
       fontSize: 50,
     };
-    const u = this.add.text(250, 100, "宇宙デニール", {
+    const u = this.add.text(250, 30, "宇宙デニール", {
       fontFamily: "sans-serif",
       ...style
     }).setName("unit.text").setDepth(depth.text)
     u.setScale(200 / u.width)
     const ub = u.getBounds()
-    const d = this.add.text(ub.left, ub.bottom, "0.400000", {
+    const d = this.add.text(ub.left - 20, ub.bottom, "0.400000", {
       align: "right",
       fontFamily: "monospace",
       ...style
@@ -93,7 +97,7 @@ export class Main extends BaseScene {
     }
     this.addTexts()
     this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5).setName("player");
-    this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.player).setScale(0.5).setName("goal");
+    this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
     {
       const kb = this.input!.keyboard!
       kb.on('keydown-RIGHT', () => this.world.inputDown(0));
@@ -132,7 +136,7 @@ export class Main extends BaseScene {
     {
       const dir = Math.atan2(goalPos.y - height / 2, goalPos.x - width / 2)
       const id = "arrow";
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id)
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id).setDepth(depth.bullet);
       const sp = o as Phaser.GameObjects.Sprite
       const ar = 200
       const ax = Math.cos(dir) * ar + width / 2
@@ -165,12 +169,15 @@ export class Main extends BaseScene {
     }
   }
 
-  upudateText() {
+  dispDist(): number {
     const g = this.world.goal.xy
     const p = this.world.player.p
-    const dist = p.dist(g) * 1e-4
+    return (p.dist(g) - 280) * 3e-2
+  }
+
+  upudateText() {
     const t = this.textByName("dist.text");
-    t.setText(stringizeDist(dist));
+    t.setText(stringizeDist(this.dispDist()));
   }
 
   update() {
