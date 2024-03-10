@@ -11,12 +11,35 @@ const depth = {
   stars: 10,
   goal: 20,
   player: 100,
+  text: 200,
 }
 
 const divmod = (n: number, d: number): { q: number, r: number } => {
   const q = Math.floor(n / d)
   const r = n - q * d
   return { q: q, r: r }
+}
+
+const stringizeDist = (d: number): string => {
+  const p = Math.max(0, Math.log10(d))
+  if (5.999 < p) { return "測定不能" }
+  const n = Math.ceil(p);
+  let r = "";
+  for (const i of range(0, 10)) {
+    const x = n - i
+    const s = Math.floor(d / 10 ** x);
+    if (x === -1) {
+      r += (r === "" ? "0." : ".")
+    }
+    if (s != 0 || r !== "") {
+      r += `${s}`
+    }
+    d -= s * 10 ** x
+    if (5 < r.length && x <= 0) {
+      break
+    }
+  }
+  return r;
 }
 
 export class Main extends BaseScene {
@@ -40,6 +63,25 @@ export class Main extends BaseScene {
     this.load.image("player", "assets/player.webp");
     this.load.image("goal", "assets/goal.webp");
   }
+  addTexts() {
+    const style = {
+      fontSize: 50,
+    };
+    const u = this.add.text(250, 100, "宇宙デニール", {
+      fontFamily: "sans-serif",
+      ...style
+    }).setName("unit.text").setDepth(depth.text)
+    u.setScale(200 / u.width)
+    const ub = u.getBounds()
+    const d = this.add.text(ub.left, ub.bottom, "0.400000", {
+      align: "right",
+      fontFamily: "monospace",
+      ...style
+    }).setOrigin(1, 1).setDepth(depth.text).setName("dist.text")
+    d.setScale(200 / d.width)
+    d.setText("")
+  }
+
   create() {
     const { width, height } = this.canvas();
     this.world.init()
@@ -49,6 +91,7 @@ export class Main extends BaseScene {
       const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
+    this.addTexts()
     this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5).setName("player");
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.player).setScale(0.5).setName("goal");
     {
@@ -122,11 +165,20 @@ export class Main extends BaseScene {
     }
   }
 
+  upudateText() {
+    const g = this.world.goal.xy
+    const p = this.world.player.p
+    const dist = p.dist(g) * 1e-4
+    const t = this.textByName("dist.text");
+    t.setText(stringizeDist(dist));
+  }
+
   update() {
     const dt = getTickSec() - this.prevTick
     this.world.update(dt)
     this.updateBG()
     this.upudateObjcts()
+    this.upudateText()
     this.prevTick += dt
   }
 }

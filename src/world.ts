@@ -18,6 +18,11 @@ export class XY {
     this.x += Math.cos(dir) * s
     this.y += Math.sin(dir) * s
   }
+  dist(o: XY): number {
+    const dx = this.x - o.x;
+    const dy = this.y - o.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
   dup(): XY {
     return new XY(this.x, this.y)
   }
