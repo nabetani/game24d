@@ -5,6 +5,9 @@ export class BaseScene extends Phaser.Scene {
   canvas(): HTMLCanvasElement {
     return this.sys.game.canvas
   }
+  spriteByName(name: string): Phaser.GameObjects.Sprite {
+    return this.sys.displayList.getByName(name) as Phaser.GameObjects.Sprite
+  }
 }
 
 export function* range(start: integer, end: integer) {

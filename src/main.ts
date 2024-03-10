@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import { BaseScene, range } from './baseScene';
-import { World } from './world';
+import { XY, World } from './world';
 
 const getTickSec = (): number => {
   return (new Date().getTime()) * 1e-3
@@ -9,7 +9,8 @@ const getTickSec = (): number => {
 const depth = {
   bg: 0,
   stars: 10,
-  player: 20,
+  goal: 20,
+  player: 100,
 }
 
 const divmod = (n: number, d: number): { q: number, r: number } => {
@@ -23,7 +24,12 @@ export class Main extends BaseScene {
   world: World = new World()
   bgs: Phaser.GameObjects.Image[] = []
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
-  player: Phaser.GameObjects.Sprite | null = null
+  get player(): Phaser.GameObjects.Sprite {
+    return this.spriteByName("player");
+  }
+  get goal(): Phaser.GameObjects.Sprite {
+    return this.spriteByName("goal");
+  }
   constructor() {
     super("Main")
   }
@@ -32,6 +38,7 @@ export class Main extends BaseScene {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
     this.load.image("player", "assets/player.webp");
+    this.load.image("goal", "assets/goal.webp");
   }
   create() {
     const { width, height } = this.canvas();
@@ -42,7 +49,8 @@ export class Main extends BaseScene {
       const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
-    this.player = this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5);
+    this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5).setName("player");
+    this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.player).setScale(0.5).setName("goal");
     {
       const kb = this.input!.keyboard!
       kb.on('keydown-RIGHT', () => this.world.inputDown(0));
@@ -54,6 +62,9 @@ export class Main extends BaseScene {
   updateBG() {
     const w = 900
     const { width, height } = this.canvas();
+    const t = -(this.world.player.r + Math.PI / 2)
+    const c = Math.cos(t)
+    const s = Math.sin(t)
     this.bgs.forEach((bg, index) => {
       const qr0 = divmod(index, 9)
       const z = qr0.q
@@ -66,15 +77,25 @@ export class Main extends BaseScene {
       const y = qr.q + icy - 1
       const wx = x * w - px
       const wy = y * w - py
-      const t = -(this.world.player.r + Math.PI / 2)
-      const c = Math.cos(t)
-      const s = Math.sin(t)
       const gx = c * wx - s * wy
       const gy = s * wx + c * wy
       bg.setPosition(gx + width / 2, gy + height / 2)
       bg.setRotation(t)
       bg.setDepth(depth.stars - z)
     })
+    const goalPos = this.gpos(c, s, this.world.goal.xy)
+    const angle = t * 180 / Math.PI
+    this.goal.setPosition(goalPos.x, goalPos.y).setAngle(angle);
+  }
+  gpos(c: number, s: number, b: XY): XY {
+    const p = this.world.player.p
+    const { width, height } = this.canvas()
+    const t = -(this.world.player.r + Math.PI / 2)
+    const wx = b.x - p.x
+    const wy = b.y - p.y
+    const gx = c * wx - s * wy
+    const gy = s * wx + c * wy
+    return new XY(gx + width / 2, gy + height / 2);
   }
   upudateObjcts() {
     const p = this.world.player.p
@@ -83,14 +104,11 @@ export class Main extends BaseScene {
     const c = Math.cos(t)
     const s = Math.sin(t)
     for (const b of this.world.bullets) {
-      const wx = b.x - p.x
-      const wy = b.y - p.y
+      const g = this.gpos(c, s, b.p)
       const id = b.id
       const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id)
-      const gx = c * wx - s * wy
-      const gy = s * wx + c * wy
       const sp = o as Phaser.GameObjects.Sprite
-      sp.setPosition(gx + width / 2, gy + height / 2)
+      sp.setPosition(g.x, g.y);
     }
   }
 

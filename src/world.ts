@@ -57,6 +57,7 @@ type Bullet = Mobj
 const Bullet = Mobj
 
 export class World {
+  get goal() { return { rad: 120, xy: new XY(200, 0) } }
   player: Mobj = Mobj.zero()
   gunCharge: number[] = []
   bullets: Bullet[] = []
