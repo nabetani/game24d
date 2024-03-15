@@ -173,6 +173,17 @@ export class Main extends BaseScene {
       this.objIDs.delete(id);
       sp.setPosition(g.x, g.y);
     }
+    for (const e of this.world.enemies) {
+      const g = this.gpos(c, s, e.p)
+      const id = e.id
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id)
+      const sp = o as Phaser.GameObjects.Sprite
+      objIDs.add(id);
+      this.objIDs.delete(id);
+      sp.setPosition(g.x, g.y);
+      const r = e.r - this.world.player.r
+      sp.setAngle(r * (180 / Math.PI))
+    }
     this.objIDs.forEach(id => {
       this.spriteByName(id).destroy()
     })

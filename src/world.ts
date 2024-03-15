@@ -18,6 +18,11 @@ export class XY {
     this.x += Math.cos(dir) * s
     this.y += Math.sin(dir) * s
   }
+  addByDir(dir: number, s: number): XY {
+    const r = this.dup()
+    r.incByDir(dir, s)
+    return r
+  }
   dist(o: XY): number {
     const dx = this.x - o.x;
     const dy = this.y - o.y;
@@ -61,13 +66,16 @@ export class Mobj {
 type Bullet = Mobj
 const Bullet = Mobj
 
+export class Enemy extends Mobj {
+}
+
 export class World {
   get goal() { return { rad: 120, xy: new XY(400, 0) } }
   player: Mobj = Mobj.zero()
+  enemies: Set<Enemy> = new Set<Enemy>();
   gunCharge: number[] = []
   bullets: Bullet[] = []
-  update(dt: number) {
-    this.player.dev(dt)
+  updateBullets(dt: number) {
     const bullets: Bullet[] = []
     for (const b of this.bullets) {
       b.dev(dt)
@@ -77,7 +85,24 @@ export class World {
     }
     this.bullets = bullets
   }
+  updateEnemies(dt: number) {
+  }
+  update(dt: number) {
+    this.player.dev(dt)
+    this.updateBullets(dt);
+    this.updateEnemies(dt);
+  }
   init() {
+    const ec = 20
+    for (const i of range(0, ec)) {
+      this.enemies.add(((): Enemy => {
+        const e = new Enemy();
+        const t = Math.PI * 2 * i / ec
+        e.p = this.goal.xy.addByDir(t, 300)
+        e.r = t
+        return e;
+      })());
+    }
   }
   charge(gunId: integer) {
     this.gunCharge[gunId] = (this.gunCharge[gunId] || 0) + 1;
