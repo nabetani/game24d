@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
-import { BaseScene, range, sincos } from './baseScene';
-import { XY, World } from './world';
+import { BaseScene, range } from './baseScene';
+import { World } from './world';
+import { XY, sincos } from './calc'
 
 const getTickSec = (): number => {
   return (new Date().getTime()) * 1e-3

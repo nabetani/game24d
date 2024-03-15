@@ -13,11 +13,6 @@ export class BaseScene extends Phaser.Scene {
   }
 }
 
-export const sincos = (a: number, b: number | null = null): { sin: number, cos: number } => {
-  const t = b === null ? a : (Math.PI * 2 * a / b)
-  return { sin: Math.sin(t), cos: Math.cos(t) }
-}
-
 export function* range(start: integer, end: integer) {
   for (let i = start; i < end; i++) {
     yield i;
