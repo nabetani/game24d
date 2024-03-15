@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { BaseScene, range } from './baseScene';
+import { BaseScene, range, sincos } from './baseScene';
 import { XY, World } from './world';
 
 const getTickSec = (): number => {
@@ -113,8 +113,7 @@ export class Main extends BaseScene {
     const w = 900
     const { width, height } = this.canvas();
     const t = -(this.world.player.r + Math.PI / 2)
-    const c = Math.cos(t)
-    const s = Math.sin(t)
+    const { sin, cos } = sincos(t);
     this.bgs.forEach((bg, index) => {
       const qr0 = divmod(index, 9)
       const z = qr0.q
@@ -127,13 +126,13 @@ export class Main extends BaseScene {
       const y = qr.q + icy - 1
       const wx = x * w - px
       const wy = y * w - py
-      const gx = c * wx - s * wy
-      const gy = s * wx + c * wy
+      const gx = cos * wx - sin * wy
+      const gy = sin * wx + cos * wy
       bg.setPosition(gx + width / 2, gy + height / 2)
       bg.setRotation(t)
       bg.setDepth(depth.stars - z)
     })
-    const goalPos = this.gpos(c, s, this.world.goal.xy)
+    const goalPos = this.gpos(cos, sin, this.world.goal.xy)
     const angle = t * 180 / Math.PI
     this.goal.setPosition(goalPos.x, goalPos.y).setAngle(angle);
     {
@@ -142,9 +141,8 @@ export class Main extends BaseScene {
       const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrow").setScale(0.5).setName(id).setDepth(depth.bullet);
       const sp = o as Phaser.GameObjects.Sprite
       const ar = 230
-      const ax = Math.cos(dir) * ar + width / 2
-      const ay = Math.sin(dir) * ar + height / 2
-      sp.setPosition(ax, ay).setAngle(90 + dir * (180 / Math.PI))
+      const a = XY.rt(ar, dir).add(width, height, 0.5)
+      sp.setPosition(a.x, a.y).setAngle(90 + dir * (180 / Math.PI))
     }
   }
   gpos(c: number, s: number, b: XY): XY {
@@ -161,11 +159,10 @@ export class Main extends BaseScene {
     const p = this.world.player.p
     const { width, height } = this.canvas()
     const t = -(this.world.player.r + Math.PI / 2)
-    const c = Math.cos(t)
-    const s = Math.sin(t)
+    const { sin, cos } = sincos(t)
     const objIDs = new Set<string>();
     for (const b of this.world.bullets) {
-      const g = this.gpos(c, s, b.p)
+      const g = this.gpos(cos, sin, b.p)
       const id = b.id
       const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id)
       const sp = o as Phaser.GameObjects.Sprite
@@ -174,7 +171,7 @@ export class Main extends BaseScene {
       sp.setPosition(g.x, g.y);
     }
     for (const e of this.world.enemies) {
-      const g = this.gpos(c, s, e.p)
+      const g = this.gpos(cos, sin, e.p)
       const id = e.id
       const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id)
       const sp = o as Phaser.GameObjects.Sprite

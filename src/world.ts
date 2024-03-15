@@ -11,6 +11,9 @@ export class XY {
   static rt(r: number, t: number): XY {
     return new XY(r * Math.cos(t), r * Math.sin(t));
   }
+  add(x: number, y: number, mul: number = 1): XY {
+    return new XY(this.x + x * mul, this.y + y * mul)
+  }
   mulAdd(o: XY, s: number): XY {
     return new XY(this.x + o.x * s, this.y + o.y * s)
   }
