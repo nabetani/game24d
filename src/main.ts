@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import { BaseScene, range } from './baseScene';
-import { World } from './world';
+import { World, PlayerType } from './world';
 import { XY, sincos } from './calc'
 
 const getTickSec = (): number => {
@@ -105,6 +105,7 @@ export class Main extends BaseScene {
     }
     this.addTexts()
     this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5).setName("player");
+    this.add.graphics().setName("pbone").setDepth(depth.player + 1)
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
     {
       const kb = this.input!.keyboard!
@@ -175,6 +176,17 @@ export class Main extends BaseScene {
     const t = -(this.world.player.r + Math.PI / 2)
     const { sin, cos } = sincos(t)
     const objIDs = new Set<string>();
+    if (false) {
+      const graphics = this.sys.displayList.getByName("pbone") as Phaser.GameObjects.Graphics
+      graphics.clear()
+      graphics.fillStyle(0xff0000)
+      const r = this.world.player.r
+      for (const [pf, px] of PlayerType.bones()) {
+        const w = p.addByDir(r, pf).addByDir(r + Math.PI / 2, px)
+        const g = this.gpos(cos, sin, w)
+        graphics.fillCircle(g.x, g.y, 10)
+      }
+    }
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)
       const id = b.id

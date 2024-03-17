@@ -57,9 +57,28 @@ export class Enemy extends Mobj {
   }
 }
 
+export class PlayerType extends Mobj {
+  killed: boolean = false
+  static bones(): [number, number][] {
+    return [[30, 18], [30, -18], [-30, -10], [-30, 10]]
+  }
+  hitTest(p: XY) {
+    const r = this.r
+    const pts = PlayerType.bones().map((p) => {
+      return this.p.addByDir(r, p[0]).addByDir(r + Math.PI / 2, p[1])
+    })
+    for (const ix of range(1, pts.length)) {
+      const seg = new Segment(pts[ix - 1], pts[ix])
+      if (seg.dist(p) < 25) {
+        this.killed = true
+      }
+    }
+  }
+}
+
 export class World {
   get goal() { return { rad: 120, xy: new XY(400, 0) } }
-  player: Mobj = Mobj.zero()
+  player: PlayerType = new PlayerType()
   enemies: Set<Enemy> = new Set<Enemy>();
   gunCharge: number[] = []
   bullets: Bullet[] = []
@@ -81,6 +100,7 @@ export class World {
         return;
       }
       e.dev(dt)
+      this.player.hitTest(e.p)
       this.bullets.forEach(b => {
         const p0 = b.p.subP(e.p)
         const p1 = b.pOld.subP(e.pOld)
@@ -96,6 +116,9 @@ export class World {
     this.enemies = enemies
   }
   update(dt: number) {
+    if (this.player.killed) {
+      return
+    }
     this.player.dev(dt)
     this.updateBullets(dt);
     this.updateEnemies(dt);
@@ -107,6 +130,13 @@ export class World {
         const e = new Enemy();
         const t = Math.PI * 2 * i / ec
         e.p = this.goal.xy.addByDir(t, 300)
+        e.r = t
+        return e;
+      })());
+      this.enemies.add(((): Enemy => {
+        const e = new Enemy();
+        const t = Math.PI * 2 * i / ec
+        e.p = XY.rt(300, t)
         e.r = t
         return e;
       })());
