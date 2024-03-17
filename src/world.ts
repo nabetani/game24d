@@ -43,6 +43,12 @@ export class Enemy extends Mobj {
   get isLiving(): boolean {
     return this.secSinceDeath < 0
   }
+  setKilled() {
+    if (this.isLiving) {
+      this.secSinceDeath = 0
+    }
+  }
+
   dev(dt: number) {
     if (!this.isLiving) {
       this.secSinceDeath += dt
@@ -69,19 +75,25 @@ export class World {
     this.bullets = bullets
   }
   updateEnemies(dt: number) {
+    const enemies: Set<Enemy> = new Set<Enemy>()
     this.enemies.forEach(e => {
+      if (!e.isLiving) {
+        return;
+      }
       e.dev(dt)
       this.bullets.forEach(b => {
         const p0 = b.p.subP(e.p)
         const p1 = b.pOld.subP(e.pOld)
         const seg = new Segment(p0, p1)
-        // console.log({ dist: seg.dist(e.p), p0: p0, p1: p1, b: b, e: e, seg: seg })
         if (seg.dist() < e.rad) {
           e.vr += 10
           b.hit = true
+          e.setKilled()
         }
       })
+      enemies.add(e)
     })
+    this.enemies = enemies
   }
   update(dt: number) {
     this.player.dev(dt)
