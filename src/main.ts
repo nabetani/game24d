@@ -11,8 +11,10 @@ const depth = {
   bg: 0,
   stars: 10,
   goal: 20,
-  player: 100,
-  bullet: 100,
+  enemy: 100,
+  player: 110,
+  bullet: 120,
+  arrow: 180,
   text: 200,
 }
 
@@ -68,7 +70,9 @@ export class Main extends BaseScene {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
     this.load.image("player", "assets/player.webp");
+    this.load.image("enemy", "assets/enemy.webp");
     this.load.image("arrow", "assets/arrow.webp");
+    this.load.image("bullet", "assets/bullet.webp");
     this.load.image("goal", "assets/goal.webp");
   }
   addTexts() {
@@ -139,7 +143,7 @@ export class Main extends BaseScene {
     {
       const dir = Math.atan2(goalPos.y - height / 2, goalPos.x - width / 2)
       const id = "arrow";
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrow").setScale(0.5).setName(id).setDepth(depth.bullet);
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrow").setScale(0.5).setName(id).setDepth(depth.arrow);
       const sp = o as Phaser.GameObjects.Sprite
       const ar = 230
       const a = XY.rt(ar, dir).add(width, height, 0.5)
@@ -156,6 +160,15 @@ export class Main extends BaseScene {
     const gy = s * wx + c * wy
     return new XY(gx + width / 2, gy + height / 2);
   }
+  addEnemy(id: string): Phaser.GameObjects.Sprite {
+    const o = this.add.sprite(0, 0, "enemy").setName(id).setDepth(depth.enemy)
+    const m = o.postFX.addColorMatrix()
+    m.hue(360 * Math.random())
+    return o
+  }
+  addBullet(id: string): Phaser.GameObjects.Sprite {
+    return this.add.sprite(0, 0, "bullet").setName(id).setDepth(depth.bullet)
+  }
   upudateObjcts() {
     const p = this.world.player.p
     const { width, height } = this.canvas()
@@ -165,16 +178,17 @@ export class Main extends BaseScene {
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)
       const id = b.id
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id).setDepth(depth.bullet)
+      const o = this.sys.displayList.getByName(id) || this.addBullet(id)
       const sp = o as Phaser.GameObjects.Sprite
       objIDs.add(id);
       this.objIDs.delete(id);
       sp.setPosition(g.x, g.y);
+      sp.setAngle((b.r - this.world.player.r) * 180 / Math.PI);
     }
     for (const e of this.world.enemies) {
       const g = this.gpos(cos, sin, e.p)
       const id = e.id
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.3).setName(id)
+      const o = this.sys.displayList.getByName(id) || this.addEnemy(id)
       const sp = o as Phaser.GameObjects.Sprite
       objIDs.add(id);
       this.objIDs.delete(id);
