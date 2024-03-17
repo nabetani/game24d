@@ -14,6 +14,18 @@ export class XY {
   static rt(r: number, t: number): XY {
     return new XY(r * Math.cos(t), r * Math.sin(t));
   }
+  ip(p: XY): number {
+    return this.x * p.x + this.y * p.y
+  }
+  subP(p: XY): XY {
+    return new XY(this.x - p.x, this.y - p.y)
+  }
+  addP(p: XY): XY {
+    return new XY(this.x + p.x, this.y + p.y)
+  }
+  atan2(): number {
+    return Math.atan2(this.y, this.x)
+  }
   add(x: number, y: number, mul: number = 1): XY {
     return new XY(this.x + x * mul, this.y + y * mul)
   }
@@ -36,5 +48,39 @@ export class XY {
   }
   dup(): XY {
     return new XY(this.x, this.y)
+  }
+}
+
+export class Segment {
+  p: [XY, XY]
+  d: XY
+  d2: number
+  a: number
+  b: number
+  c: number
+  den: number
+  constructor(p0: XY, p1: XY) {
+    this.p = [p0, p1]
+    this.d = p1.subP(p0);
+    this.d2 = this.d.ip(this.d)
+    this.a = this.d.y
+    this.b = - this.d.x
+    this.c = -(this.a * p0.x + this.b * p0.y)
+    this.den = (this.a ** 2 + this.b ** 2) ** 0.5
+  }
+  static fromEnds(p0: XY, p1: XY): Segment {
+    return new Segment(p0, p1);
+  }
+  dist(p: XY): number {
+    const d = p.subP(this.p[0])
+    const ip = d.ip(this.d)
+    const a = p.dist(this.p[0])
+    const b = p.dist(this.p[1])
+    if (ip <= 0 || this.d2 <= ip) {
+      return Math.min(a, b)
+    }
+    const num = Math.abs(this.a * p.x + this.b * p.y + this.c)
+    const c = num / this.den
+    return Math.min(a, b, c);
   }
 }
