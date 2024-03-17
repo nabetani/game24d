@@ -167,8 +167,9 @@ export class Main extends BaseScene {
     m.hue(360 * Math.random())
     return o
   }
-  addBullet(id: string): Phaser.GameObjects.Sprite {
-    return this.add.sprite(0, 0, "bullet").setName(id).setDepth(depth.bullet)
+  addBullet(id: string, charge: number): Phaser.GameObjects.Sprite {
+    console.log({ charge: charge })
+    return this.add.sprite(0, 0, "bullet").setName(id).setDepth(depth.bullet).setScale((charge + 1) / 8)
   }
   upudateObjcts() {
     const p = this.world.player.p
@@ -190,7 +191,7 @@ export class Main extends BaseScene {
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)
       const id = b.id
-      const o = this.sys.displayList.getByName(id) || this.addBullet(id)
+      const o = this.sys.displayList.getByName(id) || this.addBullet(id, b.charge)
       const sp = o as Phaser.GameObjects.Sprite
       objIDs.add(id);
       this.objIDs.delete(id);
