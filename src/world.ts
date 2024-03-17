@@ -128,6 +128,8 @@ export class World {
       return
     }
     this.player.dev(dt)
+    this.addCharge(0, dt)
+    this.addCharge(1, dt)
     this.updateBullets(dt);
     this.updateEnemies(dt);
   }
@@ -150,12 +152,15 @@ export class World {
       })());
     }
   }
-  charge(gunId: integer) {
-    this.gunCharge[gunId] = Date.now()
+  startCharging(gunId: integer) {
+    this.gunCharge[gunId] = 0
+  }
+  addCharge(gunId: integer, dt: number) {
+    const o = this.gunCharge[gunId]
+    this.gunCharge[gunId] = (o === null ? null : o + dt / 3)
   }
   charged(gunId: integer): number {
-    const now = Date.now()
-    return Math.min(1, (now - (this.gunCharge[gunId] ?? now)) / 3e3)
+    return Math.min(1, (this.gunCharge[gunId] ?? 0))
   }
   fire(gunId: integer) {
     const ch = this.charged(gunId)
@@ -172,9 +177,15 @@ export class World {
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
-    this.charge(gunId)
+    if (this.player.killed) {
+      return
+    }
+    this.startCharging(gunId)
   }
   inputUp(gunId: integer) {
+    if (this.player.killed) {
+      return
+    }
     this.fire(gunId)
   }
 };
