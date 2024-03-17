@@ -71,7 +71,8 @@ export class Segment {
   static fromEnds(p0: XY, p1: XY): Segment {
     return new Segment(p0, p1);
   }
-  dist(p: XY): number {
+  dist(p: XY | null = null): number {
+    p ??= new XY(0, 0)
     const d = p.subP(this.p[0])
     const ip = d.ip(this.d)
     const a = p.dist(this.p[0])

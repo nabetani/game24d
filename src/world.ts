@@ -1,7 +1,8 @@
 import { range } from './baseScene';
-import { XY } from './calc'
+import { Segment, XY } from './calc'
 
 export class Mobj {
+  pOld: XY = new XY(0, 0)
   p: XY = new XY(0, 0)
   v: XY = new XY(0, 0) // pix / s
   a: XY = new XY(0, 0) // pix / s**2
@@ -23,6 +24,7 @@ export class Mobj {
     this.a.x *= Mobj.forget
     this.a.y *= Mobj.forget
     this.v = this.v.mulAdd(this.a, dt)
+    this.pOld = this.p
     this.p = this.p.mulAdd(this.v, dt)
 
     this.ar *= Mobj.forget
@@ -31,10 +33,22 @@ export class Mobj {
   }
 }
 
-type Bullet = Mobj
-const Bullet = Mobj
+export class Bullet extends Mobj {
+  hit: boolean = false
+}
 
 export class Enemy extends Mobj {
+  get rad() { return 50 }
+  secSinceDeath: number = -1
+  get isLiving(): boolean {
+    return this.secSinceDeath < 0
+  }
+  dev(dt: number) {
+    if (!this.isLiving) {
+      this.secSinceDeath += dt
+    }
+    super.dev(dt)
+  }
 }
 
 export class World {
@@ -46,6 +60,7 @@ export class World {
   updateBullets(dt: number) {
     const bullets: Bullet[] = []
     for (const b of this.bullets) {
+      if (b.hit) { continue }
       b.dev(dt)
       if (this.player.p.dist(b.p) < 900) {
         bullets.push(b)
@@ -54,6 +69,19 @@ export class World {
     this.bullets = bullets
   }
   updateEnemies(dt: number) {
+    this.enemies.forEach(e => {
+      e.dev(dt)
+      this.bullets.forEach(b => {
+        const p0 = b.p.subP(e.p)
+        const p1 = b.pOld.subP(e.pOld)
+        const seg = new Segment(p0, p1)
+        // console.log({ dist: seg.dist(e.p), p0: p0, p1: p1, b: b, e: e, seg: seg })
+        if (seg.dist() < e.rad) {
+          e.vr += 10
+          b.hit = true
+        }
+      })
+    })
   }
   update(dt: number) {
     this.player.dev(dt)

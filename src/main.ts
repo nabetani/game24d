@@ -165,7 +165,7 @@ export class Main extends BaseScene {
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)
       const id = b.id
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id)
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "player").setScale(0.1).setName(id).setDepth(depth.bullet)
       const sp = o as Phaser.GameObjects.Sprite
       objIDs.add(id);
       this.objIDs.delete(id);
