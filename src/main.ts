@@ -203,6 +203,13 @@ export class Main extends BaseScene {
       const id = e.id
       const o = this.sys.displayList.getByName(id) || this.addEnemy(id)
       const sp = o as Phaser.GameObjects.Sprite
+      {
+        const scale = sp.scale
+        const z = 1 / 50
+        const u = 1.1 < scale ? 0 : z
+        const d = scale < 0.9 ? 0 : -z
+        sp.setScale(scale + Math.random() * (u - d) + d)
+      }
       objIDs.add(id);
       this.objIDs.delete(id);
       sp.setPosition(g.x, g.y);
