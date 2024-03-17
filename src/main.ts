@@ -106,6 +106,7 @@ export class Main extends BaseScene {
     this.addTexts()
     this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5).setName("player");
     this.add.graphics().setName("pbone").setDepth(depth.player + 1)
+    this.add.graphics().setName("charge").setDepth(depth.player)
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
     {
       const kb = this.input!.keyboard!
@@ -167,9 +168,8 @@ export class Main extends BaseScene {
     m.hue(360 * Math.random())
     return o
   }
-  addBullet(id: string, charge: number): Phaser.GameObjects.Sprite {
-    console.log({ charge: charge })
-    return this.add.sprite(0, 0, "bullet").setName(id).setDepth(depth.bullet).setScale((charge + 1) / 8)
+  addBullet(id: string, power: number): Phaser.GameObjects.Sprite {
+    return this.add.sprite(0, 0, "bullet").setName(id).setDepth(depth.bullet).setScale((power * 3 + 1) / 8)
   }
   upudateObjcts() {
     const p = this.world.player.p
@@ -191,7 +191,7 @@ export class Main extends BaseScene {
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)
       const id = b.id
-      const o = this.sys.displayList.getByName(id) || this.addBullet(id, b.charge)
+      const o = this.sys.displayList.getByName(id) || this.addBullet(id, b.power)
       const sp = o as Phaser.GameObjects.Sprite
       objIDs.add(id);
       this.objIDs.delete(id);
@@ -226,12 +226,33 @@ export class Main extends BaseScene {
     const t = this.textByName("dist.text");
     t.setText(stringizeDist(this.dispDist()));
   }
+  upudatePlayer() {
+    const { width, height } = this.canvas();
+    const graphics = this.graphicsByName("charge");
+    graphics.clear()
+    const h0 = 90
+    for (const gunId of [0, 1]) {
+      const ch = this.world.charged(gunId)
+      if (1 <= ch) {
+        const now = Date.now()
+        graphics.fillStyle([0xff8888, 0xffffff][(now / 200) & 1])
+      } else {
+        graphics.fillStyle(0xff0000)
+      }
+      const x = width / 2 + (gunId === 0 ? 1 : -1) * 50
+      const h = h0 * ch
+      const y = height / 2 + h0 / 2 - h
+      const w = (gunId === 0 ? 1 : -1) * -15
+      graphics.fillRect(x, y, w, h);
+    }
+  }
 
   update() {
     const dt = getTickSec() - this.prevTick
     this.world.update(dt)
     this.updateBG()
     this.upudateObjcts()
+    this.upudatePlayer()
     this.upudateText()
     this.prevTick += dt
   }

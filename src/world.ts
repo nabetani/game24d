@@ -34,13 +34,13 @@ export class Mobj {
 }
 
 export class Bullet extends Mobj {
-  _charge: number
-  constructor(charge: number) {
+  _power: number
+  constructor(power: number) {
     super()
-    this._charge = charge
+    this._power = power
   }
-  get charge(): number {
-    return Math.min(this._charge, 3)
+  get power(): number {
+    return Math.min(this._power, 1)
   }
   hit: boolean = false
 }
@@ -153,19 +153,22 @@ export class World {
   charge(gunId: integer) {
     this.gunCharge[gunId] = Date.now()
   }
-  fire(gunId: integer) {
+  charged(gunId: integer): number {
     const now = Date.now()
-    const ch = (now - (this.gunCharge[gunId] ?? now)) * 1e-3
+    return Math.min(1, (now - (this.gunCharge[gunId] ?? now)) / 3e3)
+  }
+  fire(gunId: integer) {
+    const ch = this.charged(gunId)
     this.gunCharge[gunId] = null
     const b = new Bullet(ch)
     b.p = this.player.p.dup()
     b.vr = 6
     b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 65)
     b.v = this.player.v.dup()
-    b.v.incByDir(this.player.r, 200 * (1 + b.charge))
+    b.v.incByDir(this.player.r, 200 * (1 + b.power * 3))
 
-    this.player.ar += [1, -1][gunId] * (1 + b.charge)
-    this.player.a.incByDir(this.player.r, -30 * (1 + b.charge ** 2))
+    this.player.ar += [1, -1][gunId] * (1 + b.power * 3)
+    this.player.a.incByDir(this.player.r, -30 * (1 + 10 * b.power ** 2))
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
