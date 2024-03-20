@@ -51,6 +51,7 @@ const stringizeDist = (d: number): string => {
 
 export class Main extends BaseScene {
   prevTick: number = getTickSec()
+  updateCount: integer = 0
   world: World = new World()
   bgs: Phaser.GameObjects.Image[] = []
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
@@ -241,8 +242,7 @@ export class Main extends BaseScene {
     for (const gunId of [0, 1]) {
       const ch = this.world.charged(gunId)
       if (1 <= ch) {
-        const now = Date.now()
-        graphics.fillStyle([0xff8888, 0xffffff][(now / 200) & 1])
+        graphics.fillStyle((0 == (this.updateCount & 4)) ? 0xff8888 : 0xffffff)
       } else {
         graphics.fillStyle(0xff0000)
       }
@@ -255,6 +255,7 @@ export class Main extends BaseScene {
   }
 
   update() {
+    ++this.updateCount
     const dt = getTickSec() - this.prevTick
     this.world.update(dt)
     this.updateBG()
