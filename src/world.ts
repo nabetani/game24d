@@ -45,6 +45,9 @@ export class Bullet extends Mobj {
   get dead(): boolean {
     return this.power <= 0
   }
+  get rad(): number {
+    return this.power * 60 + 10
+  }
   decPower() {
     const p = this._power
     const e = 1.4
@@ -121,7 +124,7 @@ export class World {
         const p0 = b.p.subP(e.p)
         const p1 = b.pOld.subP(e.pOld)
         const seg = new Segment(p0, p1)
-        if (seg.dist() < e.rad) {
+        if (seg.dist() < e.rad + b.rad) {
           e.vr += 10
           b.decPower()
           e.setKilled()

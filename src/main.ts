@@ -197,6 +197,7 @@ export class Main extends BaseScene {
       objIDs.add(id);
       this.objIDs.delete(id);
       sp.setPosition(g.x, g.y);
+      sp.setScale(b.rad / 80)
       sp.setAngle((b.r - this.world.player.r) * 180 / Math.PI);
     }
     for (const e of this.world.enemies) {
