@@ -40,9 +40,17 @@ export class Bullet extends Mobj {
     this._power = power
   }
   get power(): number {
-    return Math.min(this._power, 1)
+    return Math.max(0, Math.min(this._power, 1))
   }
-  hit: boolean = false
+  get dead(): boolean {
+    return this.power <= 0
+  }
+  decPower() {
+    const p = this._power
+    const e = 1.4
+    this._power = Math.max(0, p ** e - 0.02) ** (1 / e)
+    console.log({ pow0: p, pow1: this._power })
+  }
 }
 
 export class Enemy extends Mobj {
@@ -93,7 +101,7 @@ export class World {
   updateBullets(dt: number) {
     const bullets: Bullet[] = []
     for (const b of this.bullets) {
-      if (b.hit) { continue }
+      if (b.dead) { continue }
       b.dev(dt)
       if (this.player.p.dist(b.p) < 900) {
         bullets.push(b)
@@ -115,7 +123,7 @@ export class World {
         const seg = new Segment(p0, p1)
         if (seg.dist() < e.rad) {
           e.vr += 10
-          b.hit = true
+          b.decPower()
           e.setKilled()
         }
       })
@@ -157,7 +165,7 @@ export class World {
   }
   addCharge(gunId: integer, dt: number) {
     const o = this.gunCharge[gunId]
-    this.gunCharge[gunId] = (o === null ? null : o + dt / 3)
+    this.gunCharge[gunId] = (o === null ? null : o + dt)
   }
   charged(gunId: integer): number {
     return Math.min(1, (this.gunCharge[gunId] ?? 0))
@@ -172,8 +180,8 @@ export class World {
     b.v = this.player.v.dup()
     b.v.incByDir(this.player.r, 200 * (1 + b.power * 3))
 
-    this.player.ar += [1, -1][gunId] * (1 + b.power * 3)
-    this.player.a.incByDir(this.player.r, -30 * (1 + 10 * b.power ** 2))
+    this.player.ar += [1, -1][gunId] * (0.1 + b.power * 3)
+    this.player.a.incByDir(this.player.r, -10 * (0.1 + 10 * b.power ** 2))
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
