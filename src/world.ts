@@ -75,6 +75,16 @@ export class Enemy extends Mobj {
     super.dev(dt)
   }
 }
+export class Broken extends Mobj {
+  presence: number = 1
+  dev(dt: number) {
+    this.presence = Math.max(0, this.presence - dt);
+    super.dev(dt)
+  }
+  get isVisible(): boolean {
+    return 0 < this.presence
+  }
+}
 
 export class PlayerType extends Mobj {
   killed: boolean = false
@@ -99,6 +109,7 @@ export class World {
   get goal() { return { rad: 120, xy: new XY(400, 0) } }
   player: PlayerType = new PlayerType()
   enemies: Set<Enemy> = new Set<Enemy>();
+  brokens: Set<Broken> = new Set<Broken>()
   gunCharge: (number | null)[] = []
   bullets: Bullet[] = []
   updateBullets(dt: number) {
@@ -112,6 +123,30 @@ export class World {
     }
     this.bullets = bullets
   }
+  updateBrokens(dt: number) {
+    const brokens: Set<Broken> = new Set<Broken>()
+    this.brokens.forEach(b => {
+      if (!b.isVisible) {
+        return;
+      }
+      b.dev(dt)
+      brokens.add(b)
+    })
+    this.brokens = brokens
+  }
+
+  addBrokens(e: Enemy) {
+    const randDir = () => Math.PI * 2 * Math.random()
+    for (const _ of range(0, 10)) {
+      const bro = new Broken()
+      this.brokens.add(bro)
+      bro.p = e.p
+      bro.r = randDir()
+      bro.vr = randDir()
+      bro.v = e.v.addByDir(randDir(), Math.random() * 100 + 100)
+    }
+  }
+
   updateEnemies(dt: number) {
     const enemies: Set<Enemy> = new Set<Enemy>()
     this.enemies.forEach(e => {
@@ -125,7 +160,7 @@ export class World {
         const p1 = b.pOld.subP(e.pOld)
         const seg = new Segment(p0, p1)
         if (seg.dist() < e.rad + b.rad) {
-          e.vr += 10
+          this.addBrokens(e)
           b.decPower()
           e.setKilled()
         }
@@ -143,6 +178,7 @@ export class World {
     this.addCharge(1, dt)
     this.updateBullets(dt);
     this.updateEnemies(dt);
+    this.updateBrokens(dt);
   }
   init() {
     const ec = 20

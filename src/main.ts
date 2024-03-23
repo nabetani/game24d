@@ -12,6 +12,7 @@ const depth = {
   stars: 10,
   goal: 20,
   enemy: 100,
+  broken: 105,
   player: 110,
   bullet: 120,
   arrow: 180,
@@ -169,6 +170,12 @@ export class Main extends BaseScene {
     m.hue(360 * Math.random())
     return o
   }
+  addBroken(id: string): Phaser.GameObjects.Sprite {
+    const o = this.add.sprite(0, 0, "enemy").setName(id).setDepth(depth.broken)
+    const m = o.postFX.addColorMatrix()
+    m.hue(360 * Math.random())
+    return o
+  }
   addBullet(id: string, power: number): Phaser.GameObjects.Sprite {
     return this.add.sprite(0, 0, "bullet").setName(id).setDepth(depth.bullet).setScale((power * 3 + 1) / 8)
   }
@@ -199,6 +206,18 @@ export class Main extends BaseScene {
       sp.setPosition(g.x, g.y);
       sp.setScale(b.rad / 80)
       sp.setAngle((b.r - this.world.player.r) * 180 / Math.PI);
+    }
+    for (const b of this.world.brokens) {
+      const g = this.gpos(cos, sin, b.p)
+      const id = b.id
+      const o = this.sys.displayList.getByName(id) || this.addBroken(id)
+      const sp = o as Phaser.GameObjects.Sprite
+      sp.setScale(b.presence)
+      objIDs.add(id);
+      this.objIDs.delete(id);
+      sp.setPosition(g.x, g.y);
+      const r = b.r - this.world.player.r
+      sp.setAngle(r * (180 / Math.PI))
     }
     for (const e of this.world.enemies) {
       const g = this.gpos(cos, sin, e.p)
