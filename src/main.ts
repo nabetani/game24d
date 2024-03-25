@@ -96,7 +96,8 @@ export class Main extends BaseScene {
     d.setText("")
   }
 
-  create() {
+  create(data: { stage: number }) {
+    console.log(data);
     const { width, height } = this.canvas();
     this.world.init()
     this.prevTick = getTickSec()
