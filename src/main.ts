@@ -108,7 +108,7 @@ export class Main extends BaseScene {
       this.bgs.push(o)
     }
     this.addTexts()
-    this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.5).setName("player");
+    this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.25).setName("player");
     this.add.graphics().setName("pbone").setDepth(depth.player + 1)
     this.add.graphics().setName("charge").setDepth(depth.player)
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
@@ -192,11 +192,23 @@ export class Main extends BaseScene {
       graphics.clear()
       graphics.fillStyle(0xff0000)
       const r = this.world.player.r
-      for (const [pf, px] of PlayerType.bones()) {
+      PlayerType.bones().forEach(([pf, px], i) => {
         const w = p.addByDir(r, pf).addByDir(r + Math.PI / 2, px)
         const g = this.gpos(cos, sin, w)
-        graphics.fillCircle(g.x, g.y, 10)
-      }
+        graphics.fillCircle(g.x, g.y, 5)
+        if (i != 0) {
+          const [pf0, px0] = PlayerType.bones()[i - 1]
+          for (const ix of range(1, 5)) {
+            const m = ix / 5
+            const ipx = px * m + px0 * (1 - m)
+            const ipf = pf * m + pf0 * (1 - m)
+            const w = p.addByDir(r, ipf).addByDir(r + Math.PI / 2, ipx)
+            const g = this.gpos(cos, sin, w)
+            graphics.fillCircle(g.x, g.y, 2)
+          }
+        }
+      })
+
     }
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)

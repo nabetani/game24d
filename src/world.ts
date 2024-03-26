@@ -90,7 +90,7 @@ export class Broken extends Mobj {
 export class PlayerType extends Mobj {
   killed: boolean = false
   static bones(): [number, number][] {
-    return [[30, 18], [30, -18], [-30, -10], [-30, 10]]
+    return [[15, -9], [-15, -5], [-15, 5], [15, 9]]
   }
   hitTest(p: XY) {
     const r = this.r
@@ -212,7 +212,7 @@ export class World {
     const b = new Bullet(ch)
     b.p = this.player.p.dup()
     b.vr = 6
-    b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 65)
+    b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 32)
     b.v = this.player.v.dup()
     b.v.incByDir(this.player.r, 200 * (1 + b.power * 3))
 
