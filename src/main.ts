@@ -99,7 +99,8 @@ export class Main extends BaseScene {
   create(data: { stage: number }) {
     console.log(data);
     const { width, height } = this.canvas();
-    this.world.init()
+    this.world = new World()
+    this.world.init(data.stage)
     this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
     for (const ix of range(0, 9 * 6)) {

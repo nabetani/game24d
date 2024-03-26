@@ -11,6 +11,9 @@ export class XY {
     this.x = x
     this.y = y
   }
+  static zero(): XY {
+    return new XY(0, 0);
+  }
   static rt(r: number, t: number): XY {
     return new XY(r * Math.cos(t), r * Math.sin(t));
   }

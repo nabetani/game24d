@@ -1,5 +1,6 @@
 import { range } from './baseScene';
 import { Segment, XY } from './calc'
+import { stages } from './stages';
 
 export class Mobj {
   pOld: XY = new XY(0, 0)
@@ -106,7 +107,8 @@ export class PlayerType extends Mobj {
 }
 
 export class World {
-  get goal() { return { rad: 120, xy: new XY(400, 0) } }
+  _goal = { rad: 120, xy: new XY(400, 0) }
+  get goal() { return this._goal }
   player: PlayerType = new PlayerType()
   enemies: Set<Enemy> = new Set<Enemy>();
   brokens: Set<Broken> = new Set<Broken>()
@@ -123,6 +125,20 @@ export class World {
     }
     this.bullets = bullets
   }
+  init(stage: number) {
+    const s = stages[stage]()
+    s.enemies.forEach(
+      (ei) => {
+        const e = new Enemy();
+        e.p = ei.p
+        e.r = ei.r
+        e.v = ei.v
+        this.enemies.add(e)
+      }
+    );
+    this._goal.xy = s.goal
+  }
+
   updateBrokens(dt: number) {
     const brokens: Set<Broken> = new Set<Broken>()
     this.brokens.forEach(b => {
@@ -179,25 +195,6 @@ export class World {
     this.updateBullets(dt);
     this.updateEnemies(dt);
     this.updateBrokens(dt);
-  }
-  init() {
-    const ec = 20
-    for (const i of range(0, ec)) {
-      this.enemies.add(((): Enemy => {
-        const e = new Enemy();
-        const t = Math.PI * 2 * i / ec
-        e.p = this.goal.xy.addByDir(t, 300)
-        e.r = t
-        return e;
-      })());
-      this.enemies.add(((): Enemy => {
-        const e = new Enemy();
-        const t = Math.PI * 2 * i / ec
-        e.p = XY.rt(300, t)
-        e.r = t
-        return e;
-      })());
-    }
   }
   startCharging(gunId: integer) {
     this.gunCharge[gunId] = 0
