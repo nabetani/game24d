@@ -32,6 +32,9 @@ export class XY {
   add(x: number, y: number, mul: number = 1): XY {
     return new XY(this.x + x * mul, this.y + y * mul)
   }
+  mul(s: number): XY {
+    return new XY(this.x * s, this.y * s);
+  }
   mulAdd(o: XY, s: number): XY {
     return new XY(this.x + o.x * s, this.y + o.y * s)
   }
@@ -48,6 +51,12 @@ export class XY {
     const dx = this.x - o.x;
     const dy = this.y - o.y;
     return Math.sqrt(dx * dx + dy * dy);
+  }
+  get norm2(): number {
+    return this.x ** 2 + this.y ** 2;
+  }
+  get norm(): number {
+    return Math.sqrt(this.norm2)
   }
   dup(): XY {
     return new XY(this.x, this.y)

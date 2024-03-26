@@ -22,8 +22,7 @@ export class Mobj {
   get y(): number { return this.p.y }
   static forget: number = 0.9
   dev(dt: number) {
-    this.a.x *= Mobj.forget
-    this.a.y *= Mobj.forget
+    this.a.mul(Mobj.forget);
     this.v = this.v.mulAdd(this.a, dt)
     this.pOld = this.p
     this.p = this.p.mulAdd(this.v, dt)
@@ -58,6 +57,7 @@ export class Bullet extends Mobj {
 }
 
 export class Enemy extends Mobj {
+  aproc: null | ((p: XY, ep: XY, ev: XY) => XY) = null
   get rad() { return 50 }
   secSinceDeath: number = -1
   get isLiving(): boolean {
@@ -133,6 +133,7 @@ export class World {
         e.p = ei.p
         e.r = ei.r
         e.v = ei.v
+        e.aproc = ei.a || null
         this.enemies.add(e)
       }
     );
@@ -168,6 +169,9 @@ export class World {
     this.enemies.forEach(e => {
       if (!e.isLiving) {
         return;
+      }
+      if (e.aproc) {
+        e.a = e.aproc(this.player.p, e.p, e.v)
       }
       e.dev(dt)
       this.player.hitTest(e.p)
