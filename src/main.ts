@@ -120,6 +120,14 @@ export class Main extends BaseScene {
       kb.on('keyup-RIGHT', () => this.world.inputUp(0));
       kb.on('keyup-LEFT', () => this.world.inputUp(1));
     }
+    const zones = [
+      this.add.zone(width, height / 2, width, height),
+      this.add.zone(0, height / 2, width, height)]
+    zones.forEach((z, ix) => {
+      z.setInteractive()
+      z.on("pointerdown", () => { this.world.inputDown(ix) });
+      z.on("pointerup", () => { this.world.inputUp(ix) });
+    })
   }
   updateBG() {
     const w = 900
