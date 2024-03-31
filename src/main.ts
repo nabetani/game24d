@@ -57,6 +57,7 @@ export class Main extends BaseScene {
   bgs: Phaser.GameObjects.Image[] = []
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
   objIDs: Set<string> = new Set<string>();
+  cleared: boolean = false
 
   get player(): Phaser.GameObjects.Sprite {
     return this.spriteByName("player");
@@ -287,15 +288,29 @@ export class Main extends BaseScene {
       graphics.fillRect(x, y, w, h);
     }
   }
-
+  showWelcomeBack() {
+    const { width, height } = this.canvas()
+    this.add.text(width * 0.5, height * 0.6, "Welcome Back!", {
+      fontFamily: "serif",
+      fontStyle: "Bold",
+      fontSize: 60,
+    }).setDepth(depth.text).setOrigin(0.5, 0.5).setShadow(3, 3, "black")
+  }
   update() {
-    ++this.updateCount
-    const dt = getTickSec() - this.prevTick
-    this.world.update(dt)
-    this.updateBG()
-    this.upudateObjcts()
-    this.upudatePlayer()
-    this.upudateText()
-    this.prevTick += dt
+    if (this.cleared) {
+    } else {
+      ++this.updateCount
+      const dt = getTickSec() - this.prevTick
+      this.world.update(dt)
+      this.updateBG()
+      this.upudateObjcts()
+      this.upudatePlayer()
+      this.upudateText()
+      this.prevTick += dt
+      this.cleared = this.dispDist() <= 0
+      if (this.cleared) {
+        this.showWelcomeBack()
+      }
+    }
   }
 }
