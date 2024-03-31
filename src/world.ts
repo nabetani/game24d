@@ -22,7 +22,7 @@ export class Mobj {
   get y(): number { return this.p.y }
   static forget: number = 0.9
   dev(dt: number) {
-    this.a.mul(Mobj.forget);
+    this.a = this.a.mul(Mobj.forget);
     this.v = this.v.mulAdd(this.a, dt)
     this.pOld = this.p
     this.p = this.p.mulAdd(this.v, dt)
@@ -193,6 +193,7 @@ export class World {
     if (this.player.killed) {
       return
     }
+    // console.log({ player_a: this.player.a.norm, player_v: this.player.v.norm })
     this.player.dev(dt)
     this.addCharge(0, dt)
     this.addCharge(1, dt)
@@ -221,7 +222,7 @@ export class World {
     b.v.incByDir(this.player.r, 200 * (1 + b.power * 3))
 
     this.player.ar += [1, -1][gunId] * (0.1 + b.power * 3)
-    this.player.a.incByDir(this.player.r, -10 * (0.1 + 10 * b.power ** 2))
+    this.player.a.incByDir(this.player.r, -100 * (0.1 + 10 * b.power ** 2))
     this.bullets.push(b)
   }
   inputDown(gunId: integer) {
