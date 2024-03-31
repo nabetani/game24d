@@ -8,6 +8,9 @@ const config: Phaser.Types.Core.GameConfig = {
   height: 900,
   parent: 'game-app',
   scene: [Title, Main],
+  input: {
+    activePointers: 3
+  },
   fps: {
     target: 60,
     forceSetTimeOut: true
