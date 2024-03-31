@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
-import { BaseScene, range } from './baseScene';
+import { BaseScene } from './baseScene';
 import { World, PlayerType } from './world';
-import { XY, sincos } from './calc'
+import { XY, sincos, clamp, range } from './calc'
 
 const getTickSec = (): number => {
   return (new Date().getTime()) * 1e-3
@@ -51,6 +51,7 @@ const stringizeDist = (d: number): string => {
 }
 
 export class Main extends BaseScene {
+  starLayerCount: number = 6
   prevTick: number = getTickSec()
   updateCount: integer = 0
   world: World = new World()
@@ -104,7 +105,8 @@ export class Main extends BaseScene {
     this.world.init(data.stage)
     this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
-    for (const ix of range(0, 9 * 6)) {
+    const starLayerCount = 6
+    for (const ix of range(0, 9 * starLayerCount)) {
       const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
@@ -137,20 +139,24 @@ export class Main extends BaseScene {
     this.bgs.forEach((bg, index) => {
       const qr0 = divmod(index, 9)
       const z = qr0.q
-      const px = this.world.player.x * (1.2 ** -z)
-      const py = this.world.player.y * (1.2 ** -z)
-      const icx = Math.floor(px / w + 0.5)
-      const icy = Math.floor(py / w + 0.5)
-      const qr = divmod(qr0.r, 3)
-      const x = qr.r + icx - 1
-      const y = qr.q + icy - 1
-      const wx = x * w - px
-      const wy = y * w - py
-      const gx = cos * wx - sin * wy
-      const gy = sin * wx + cos * wy
-      bg.setPosition(gx + width / 2, gy + height / 2)
-      bg.setRotation(t)
-      bg.setDepth(depth.stars - z)
+      if (z <= this.starLayerCount) {
+        const px = this.world.player.x * (1.2 ** -z)
+        const py = this.world.player.y * (1.2 ** -z)
+        const icx = Math.floor(px / w + 0.5)
+        const icy = Math.floor(py / w + 0.5)
+        const qr = divmod(qr0.r, 3)
+        const x = qr.r + icx - 1
+        const y = qr.q + icy - 1
+        const wx = x * w - px
+        const wy = y * w - py
+        const gx = cos * wx - sin * wy
+        const gy = sin * wx + cos * wy
+        bg.setPosition(gx + width / 2, gy + height / 2)
+        bg.setRotation(t)
+        bg.setDepth(depth.stars - z)
+      } else {
+        bg.setVisible(false)
+      }
     })
     const goalPos = this.gpos(cos, sin, this.world.goal.xy)
     const angle = t * 180 / Math.PI
@@ -247,7 +253,7 @@ export class Main extends BaseScene {
       const id = e.id
       const o = this.sys.displayList.getByName(id) || this.addEnemy(id)
       const sp = o as Phaser.GameObjects.Sprite
-      {
+      if (false) {
         const scale = sp.scale
         const z = 1 / 50
         const u = 1.1 < scale ? 0 : z
@@ -309,7 +315,9 @@ export class Main extends BaseScene {
     } else {
       ++this.updateCount
       const dt = getTickSec() - this.prevTick
-      this.world.update(dt)
+      this.starLayerCount = clamp(6 / 30 / dt, 1, this.starLayerCount)
+      console.log({ starLayerCount: this.starLayerCount })
+      this.world.update(dt, this.starLayerCount)
       this.updateBG()
       this.upudateObjcts()
       this.upudatePlayer()

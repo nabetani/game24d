@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
-import { BaseScene, range } from './baseScene';
+import { BaseScene } from './baseScene';
+import { range } from './calc';
 
 export class Title extends BaseScene {
   constructor() {

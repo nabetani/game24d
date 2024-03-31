@@ -3,6 +3,22 @@ export const sincos = (a: number, b: number | null = null): { sin: number, cos: 
   return { sin: Math.sin(t), cos: Math.cos(t) }
 }
 
+export function* range(start: integer, end: integer) {
+  for (let i = start; i < end; i++) {
+    yield i;
+  }
+}
+
+export const clamp = (v: number, low: number, high: number): number => {
+  const lo = Math.min(low, high)
+  const hi = Math.max(low, high)
+  if (v < lo) {
+    return lo
+  }
+  if (hi < v) { return hi }
+  return v
+}
+
 // x と y
 export class XY {
   x: number

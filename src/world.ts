@@ -1,5 +1,4 @@
-import { range } from './baseScene';
-import { Segment, XY } from './calc'
+import { Segment, XY, range } from './calc'
 import { stages } from './stages';
 
 export class Mobj {
@@ -133,6 +132,7 @@ export class World {
         e.p = ei.p
         e.r = ei.r
         e.v = ei.v
+        e.vr = ei.vr ?? 0
         e.aproc = ei.a || null
         this.enemies.add(e)
       }
@@ -152,9 +152,9 @@ export class World {
     this.brokens = brokens
   }
 
-  addBrokens(e: Enemy) {
+  addBrokens(e: Enemy, slc: number) {
     const randDir = () => Math.PI * 2 * Math.random()
-    for (const _ of range(0, 10)) {
+    for (const _ of range(0, slc * 2 + 2)) {
       const bro = new Broken()
       this.brokens.add(bro)
       bro.p = e.p
@@ -164,7 +164,7 @@ export class World {
     }
   }
 
-  updateEnemies(dt: number) {
+  updateEnemies(dt: number, slc: number) {
     const enemies: Set<Enemy> = new Set<Enemy>()
     this.enemies.forEach(e => {
       if (!e.isLiving) {
@@ -180,7 +180,7 @@ export class World {
         const p1 = b.pOld.subP(e.pOld)
         const seg = new Segment(p0, p1)
         if (seg.dist() < e.rad + b.rad) {
-          this.addBrokens(e)
+          this.addBrokens(e, slc)
           b.decPower()
           e.setKilled()
         }
@@ -189,7 +189,7 @@ export class World {
     })
     this.enemies = enemies
   }
-  update(dt: number) {
+  update(dt: number, slc: number) {
     if (this.player.killed) {
       return
     }
@@ -198,7 +198,7 @@ export class World {
     this.addCharge(0, dt)
     this.addCharge(1, dt)
     this.updateBullets(dt);
-    this.updateEnemies(dt);
+    this.updateEnemies(dt, slc);
     this.updateBrokens(dt);
   }
   startCharging(gunId: integer) {

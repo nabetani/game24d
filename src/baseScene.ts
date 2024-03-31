@@ -15,9 +15,3 @@ export class BaseScene extends Phaser.Scene {
     return this.sys.displayList.getByName(name) as Phaser.GameObjects.Text
   }
 }
-
-export function* range(start: integer, end: integer) {
-  for (let i = start; i < end; i++) {
-    yield i;
-  }
-}
