@@ -15,7 +15,8 @@ const depth = {
   broken: 105,
   player: 110,
   bullet: 120,
-  arrow: 180,
+  arrowG: 180,
+  arrowD: 190,
   text: 200,
 }
 
@@ -75,7 +76,8 @@ export class Main extends BaseScene {
     }
     this.load.image("player", "assets/player.webp");
     this.load.image("enemy", "assets/enemy.webp");
-    this.load.image("arrow", "assets/arrow.webp");
+    this.load.image("arrowD", "assets/arrowD.webp");
+    this.load.image("arrowG", "assets/arrowG.webp");
     this.load.image("bullet", "assets/bullet.webp");
     this.load.image("goal", "assets/goal.webp");
   }
@@ -163,12 +165,29 @@ export class Main extends BaseScene {
     this.goal.setPosition(goalPos.x, goalPos.y).setAngle(angle);
     {
       const dir = Math.atan2(goalPos.y - height / 2, goalPos.x - width / 2)
-      const id = "arrow";
-      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrow").setScale(0.5).setName(id).setDepth(depth.arrow);
+      const id = "arrowG";
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrowG").setScale(0.5).setName(id).setDepth(depth.arrowG);
       const sp = o as Phaser.GameObjects.Sprite
-      const ar = 230
+      const ar = 200
       const a = XY.rt(ar, dir).add(width, height, 0.5)
       sp.setPosition(a.x, a.y).setAngle(90 + dir * (180 / Math.PI))
+    }
+    {
+      const sv = Math.log2(this.world.player.v.norm2) - 10
+      const id = "arrowD";
+      const o = this.sys.displayList.getByName(id) || this.add.sprite(0, 0, "arrowD").setName(id).setDepth(depth.arrowD);
+      const sp = o as Phaser.GameObjects.Sprite
+      if (sv < 2) {
+        sp.setVisible(false)
+      } else {
+        console.log({ sv: sv })
+        sp.setVisible(true)
+        sp.setScale(0.5 + sv / 10)
+        const dir = this.world.player.v.atan2() - this.world.player.r - Math.PI / 2;
+        const ar = 100 + sv * 4
+        const a = XY.rt(ar, dir).add(width, height, 0.5)
+        sp.setPosition(a.x, a.y).setAngle(90 + dir * (180 / Math.PI))
+      }
     }
   }
   gpos(c: number, s: number, b: XY): XY {
