@@ -202,14 +202,15 @@ export class Main extends BaseScene {
   }
   addEnemy(id: string): Phaser.GameObjects.Sprite {
     const o = this.add.sprite(0, 0, "enemy").setName(id).setDepth(depth.enemy)
-    const m = o.postFX.addColorMatrix()
-    m.hue(360 * Math.random())
+    // const m = o.postFX.addColorMatrix()
+    // m.hue(360 * Math.random())
     return o
   }
-  addBroken(id: string): Phaser.GameObjects.Sprite {
-    const o = this.add.sprite(0, 0, "enemy").setName(id).setDepth(depth.broken)
-    const m = o.postFX.addColorMatrix()
-    m.hue(360 * Math.random())
+  addBroken(id: string): Phaser.GameObjects.Graphics {
+    const o = this.add.graphics()
+    o.fillStyle(0xffffff)
+    o.fillCircle(0, 0, 30)
+    o.setName(id).setDepth(depth.broken)
     return o
   }
   addBullet(id: string, power: number): Phaser.GameObjects.Sprite {
@@ -259,13 +260,13 @@ export class Main extends BaseScene {
       const g = this.gpos(cos, sin, b.p)
       const id = b.id
       const o = this.sys.displayList.getByName(id) || this.addBroken(id)
-      const sp = o as Phaser.GameObjects.Sprite
-      sp.setScale(b.presence)
+      const gr = o as Phaser.GameObjects.Graphics
       objIDs.add(id);
       this.objIDs.delete(id);
-      sp.setPosition(g.x, g.y);
+      gr.setScale((1 - b.presence ** 4))
+      gr.setAlpha(Math.min(1, b.presence * 1.5))
+      gr.setPosition(g.x, g.y);
       const r = b.r - this.world.player.r
-      sp.setAngle(r * (180 / Math.PI))
     }
     for (const e of this.world.enemies) {
       const g = this.gpos(cos, sin, e.p)

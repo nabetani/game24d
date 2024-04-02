@@ -152,16 +152,11 @@ export class World {
     this.brokens = brokens
   }
 
-  addBrokens(e: Enemy, slc: number) {
-    const randDir = () => Math.PI * 2 * Math.random()
-    for (const _ of range(0, slc * 2 + 2)) {
-      const bro = new Broken()
-      this.brokens.add(bro)
-      bro.p = e.p
-      bro.r = randDir()
-      bro.vr = randDir()
-      bro.v = e.v.addByDir(randDir(), Math.random() * 100 + 100)
-    }
+  addBrokens(e: Enemy) {
+    const bro = new Broken()
+    this.brokens.add(bro)
+    bro.p = e.p
+    bro.v = e.v.dup()
   }
 
   updateEnemies(dt: number, slc: number) {
@@ -180,7 +175,7 @@ export class World {
         const p1 = b.pOld.subP(e.pOld)
         const seg = new Segment(p0, p1)
         if (seg.dist() < e.rad + b.rad) {
-          this.addBrokens(e, slc)
+          this.addBrokens(e)
           b.decPower()
           e.setKilled()
         }
