@@ -51,7 +51,10 @@ const stringizeDist = (d: number): string => {
   return r;
 }
 
+const enemyImageCount = 7
+
 export class Main extends BaseScene {
+  enemyImageIx: number = 0
   starLayerCount: number = 6
   prevTick: number = getTickSec()
   updateCount: integer = 0
@@ -79,7 +82,7 @@ export class Main extends BaseScene {
     this.load.image("arrowD", "assets/arrowD.webp");
     this.load.image("arrowG", "assets/arrowG.webp");
     this.load.image("bullet", "assets/bullet.webp");
-    for (const e of range(0, 5)) {
+    for (const e of range(0, enemyImageCount)) {
       this.load.image(`enemy${e}`, `assets/enemy${e}.webp`);
     }
   }
@@ -203,8 +206,8 @@ export class Main extends BaseScene {
     return new XY(gx + width / 2, gy + height / 2);
   }
   addEnemy(id: string): Phaser.GameObjects.Sprite {
-    const e = Math.floor(Math.random() * 5);
-    const o = this.add.sprite(0, 0, `enemy${e}`).setName(id).setDepth(depth.enemy)
+    const o = this.add.sprite(0, 0, `enemy${this.enemyImageIx}`).setName(id).setDepth(depth.enemy)
+    this.enemyImageIx = (this.enemyImageIx + 1) % enemyImageCount
     // const m = o.postFX.addColorMatrix()
     // m.hue(360 * Math.random())
     return o
