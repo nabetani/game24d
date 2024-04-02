@@ -75,11 +75,13 @@ export class Main extends BaseScene {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
     this.load.image("player", "assets/player.webp");
-    this.load.image("enemy", "assets/enemy.webp");
+    this.load.image("goal", "assets/goal.webp");
     this.load.image("arrowD", "assets/arrowD.webp");
     this.load.image("arrowG", "assets/arrowG.webp");
     this.load.image("bullet", "assets/bullet.webp");
-    this.load.image("goal", "assets/goal.webp");
+    for (const e of range(0, 5)) {
+      this.load.image(`enemy${e}`, `assets/enemy${e}.webp`);
+    }
   }
   addTexts() {
     const style = {
@@ -201,7 +203,8 @@ export class Main extends BaseScene {
     return new XY(gx + width / 2, gy + height / 2);
   }
   addEnemy(id: string): Phaser.GameObjects.Sprite {
-    const o = this.add.sprite(0, 0, "enemy").setName(id).setDepth(depth.enemy)
+    const e = Math.floor(Math.random() * 5);
+    const o = this.add.sprite(0, 0, `enemy${e}`).setName(id).setDepth(depth.enemy)
     // const m = o.postFX.addColorMatrix()
     // m.hue(360 * Math.random())
     return o
