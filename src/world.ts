@@ -1,5 +1,5 @@
 import { Segment, XY, range } from './calc'
-import { stages } from './stages';
+import { stages, pva } from './stages';
 
 export class Mobj {
   pOld: XY = new XY(0, 0)
@@ -57,7 +57,7 @@ export class Bullet extends Mobj {
 
 export class Enemy extends Mobj {
   im: number = 0
-  aproc: null | ((p: XY, ep: XY, ev: XY) => XY) = null
+  pvaProc: null | ((p: XY, ep: XY, ev: XY, dt: number) => pva) = null
   get rad() { return 50 }
   secSinceDeath: number = -1
   get isLiving(): boolean {
@@ -135,7 +135,7 @@ export class World {
         e.r = ei.r
         e.v = ei.v
         e.vr = ei.vr ?? 0
-        e.aproc = ei.a || null
+        e.pvaProc = ei.pva || null
         this.enemies.add(e)
       }
     );
@@ -167,8 +167,11 @@ export class World {
       if (!e.isLiving) {
         return;
       }
-      if (e.aproc) {
-        e.a = e.aproc(this.player.p, e.p, e.v)
+      if (e.pvaProc) {
+        const act = e.pvaProc(this.player.p, e.p, e.v, dt)
+        e.p = act.p ?? e.p
+        e.v = act.v ?? e.v
+        e.a = act.a ?? e.a
       }
       e.dev(dt)
       this.player.hitTest(e.p)
