@@ -56,6 +56,7 @@ export class Bullet extends Mobj {
 }
 
 export class Enemy extends Mobj {
+  im: number = 0
   aproc: null | ((p: XY, ep: XY, ev: XY) => XY) = null
   get rad() { return 50 }
   secSinceDeath: number = -1
@@ -129,6 +130,7 @@ export class World {
     s.enemies.forEach(
       (ei) => {
         const e = new Enemy();
+        e.im = ei.im
         e.p = ei.p
         e.r = ei.r
         e.v = ei.v

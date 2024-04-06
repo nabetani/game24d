@@ -27,11 +27,17 @@ export class XY {
     this.x = x
     this.y = y
   }
+  static xy(x: number, y: number): XY {
+    return new XY(x, y)
+  }
   static zero(): XY {
     return new XY(0, 0);
   }
   static rt(r: number, t: number): XY {
     return new XY(r * Math.cos(t), r * Math.sin(t));
+  }
+  static ra(r: number, a: number): XY {
+    return XY.rt(r, a * Math.PI / 180);
   }
   ip(p: XY): number {
     return this.x * p.x + this.y * p.y

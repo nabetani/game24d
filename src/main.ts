@@ -54,7 +54,6 @@ const stringizeDist = (d: number): string => {
 const enemyImageCount = 7
 
 export class Main extends BaseScene {
-  enemyImageIx: number = 0
   starLayerCount: number = 6
   prevTick: number = getTickSec()
   updateCount: integer = 0
@@ -205,9 +204,8 @@ export class Main extends BaseScene {
     const gy = s * wx + c * wy
     return new XY(gx + width / 2, gy + height / 2);
   }
-  addEnemy(id: string): Phaser.GameObjects.Sprite {
-    const o = this.add.sprite(0, 0, `enemy${this.enemyImageIx}`).setName(id).setDepth(depth.enemy)
-    this.enemyImageIx = (this.enemyImageIx + 1) % enemyImageCount
+  addEnemy(id: string, im: number): Phaser.GameObjects.Sprite {
+    const o = this.add.sprite(0, 0, `enemy${im}`).setName(id).setDepth(depth.enemy)
     // const m = o.postFX.addColorMatrix()
     // m.hue(360 * Math.random())
     return o
@@ -277,7 +275,7 @@ export class Main extends BaseScene {
     for (const e of this.world.enemies) {
       const g = this.gpos(cos, sin, e.p)
       const id = e.id
-      const o = this.sys.displayList.getByName(id) || this.addEnemy(id)
+      const o = this.sys.displayList.getByName(id) || this.addEnemy(id, e.im)
       const sp = o as Phaser.GameObjects.Sprite
       if (false) {
         const scale = sp.scale

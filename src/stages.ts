@@ -1,7 +1,7 @@
 import { XY, range } from './calc'
 
 type goal_t = XY
-type enemies_t = { p: XY, v: XY, r: number, vr?: number, a?: (p: XY, ep: XY, ev: XY) => XY }
+type enemies_t = { p: XY, v: XY, r: number, vr?: number, im: number, a?: (p: XY, ep: XY, ev: XY) => XY }
 type stage_t = { goal: goal_t, enemies: enemies_t[] }
 
 const chase = (p: XY, ep: XY, ev: XY): XY => {
@@ -10,35 +10,28 @@ const chase = (p: XY, ep: XY, ev: XY): XY => {
   return a.mul(30 / r)
 };
 
+const e0 = (pos: XY): enemies_t => {
+  return { p: pos, v: XY.xy(0, 0), r: 0, vr: 1, im: 0 }
+}
+
+const e1 = (pos: XY, velo: XY): enemies_t => {
+  return { p: pos, v: velo, r: 0, vr: 1, im: 1, a: chase }
+}
+
 export const stages: (() => stage_t)[] = [
   /* 0 */ () => { throw "" },
 
   /* 1 */ () => ({
     goal: XY.rt(-400, 0), enemies: [
-      { p: XY.rt(400, 0), v: XY.zero(), r: 0 }
+      e0(XY.xy(400, 0)),
     ]
   }),
   /* 2 */ () => {
     return {
       goal: XY.rt(400, 0), enemies: [
-        { p: XY.rt(200, Math.PI * 0.5), v: new XY(100, 0), r: 0, a: chase },
-        // { p: XY.rt(400, Math.PI * 1.0), v: XY.zero(), r: 0 },
-        { p: XY.rt(200, Math.PI * 1.5), v: new XY(-100, 0), r: 0, a: chase },
+        e1(XY.ra(200, 90), XY.ra(100, 0)),
+        e1(XY.ra(200, 270), XY.ra(100, 180)),
       ]
-    }
-  },
-  /* 3 */ () => {
-    const n = 30
-    return {
-      goal: XY.rt(400, 0), enemies: [...range(0, n)].map((i) => {
-        return {
-          p: XY.rt(300, Math.PI * 2 * i / n),
-          v: XY.rt(100, Math.PI * (2 * i / n + 0.5)),
-          r: Math.PI * (32 ** 0.5) * i / n,
-          a: chase,
-          vr: Math.PI
-        }
-      })
     }
   },
 ];
