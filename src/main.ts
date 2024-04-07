@@ -77,51 +77,46 @@ export class Main extends BaseScene {
       fontSize: 20,
       stroke: "black",
       strokeThickness: 5,
-
     };
-    const du = this.add.text(500, 50, "宇宙デニール", {
+    const w = 90
+    const du = this.add.text(510, 50, "宇宙デニール", {
       fontFamily: "sans-serif",
       ...style
     }).setName("dunit.text").setDepth(depth.text)
-    du.setScale(120 / du.width).setOrigin(1, 1)
+    du.setScale(w / du.width).setOrigin(1, 1)
     const duB = du.getBounds()
-    const d = this.add.text(duB.left, duB.bottom, "0.400000", {
+    const d = this.add.text(duB.left, duB.bottom, "12345.0", {
       align: "right",
       fontFamily: "monospace",
       ...style
     }).setOrigin(1, 1).setDepth(depth.text).setName("dist.text")
-    d.setScale(120 / d.width)
+    d.setScale(w / d.width)
     const dB = d.getBounds()
     d.setText("")
     //
-    const ru = this.add.text(dB.left - 20, dB.bottom, "秒", {
-      fontFamily: "sans-serif",
-      ...style,
-    }).setOrigin(1, 1).setDepth(depth.text).setName("tunit.text")
-    ru.setScale(du.scale)
-    const ruB = ru.getBounds()
-    const r = this.add.text(ruB.left, ruB.bottom, "100.0", {
-      align: "right",
-      fontFamily: "monospace",
-      ...style
-    }).setOrigin(1, 1).setDepth(depth.text).setName("tick.text")
-    r.setScale(d.scale)
-    const rB = r.getBounds()
-    r.setText("")
-    //
-    const fu = this.add.text(rB.left - 20, rB.bottom, "発", {
-      fontFamily: "sans-serif",
-      ...style,
-    }).setOrigin(1, 1).setDepth(depth.text).setName("funit.text")
-    fu.setScale(du.scale)
-    const fuB = fu.getBounds()
-    const f = this.add.text(fuB.left, fuB.bottom, "1000", {
-      align: "right",
-      fontFamily: "monospace",
-      ...style
-    }).setOrigin(1, 1).setDepth(depth.text).setName("fire.text")
-    f.setScale(d.scale)
-    f.setText("")
+    const fixed = (text: string, bounds: Phaser.Geom.Rectangle): Phaser.Geom.Rectangle => {
+      const t = this.add.text(bounds.left - 20, bounds.bottom, text, {
+        fontFamily: "sans-serif",
+        ...style,
+      }).setOrigin(1, 1).setDepth(depth.text).setScale(du.scale)
+      return t.getBounds()
+    }
+    const numT = (text: string, name: string, bounds: Phaser.Geom.Rectangle): Phaser.Geom.Rectangle => {
+      const r = this.add.text(bounds.left, bounds.bottom, text, {
+        align: "right",
+        fontFamily: "monospace",
+        ...style
+      }).setOrigin(1, 1).setDepth(depth.text).setName(name).setScale(d.scale)
+      const rB = r.getBounds()
+      r.setText("")
+      return rB
+    }
+    const ruB = fixed("秒", dB)
+    const rB = numT("100.0", "tick.text", ruB)
+    const fuB = fixed("発", rB)
+    const fB = numT("1000", "fire.text", fuB)
+    const kuB = fixed("殺", fB)
+    const kB = numT("100", "kill.text", kuB)
   }
 
 
@@ -343,6 +338,7 @@ export class Main extends BaseScene {
     this.textByName("dist.text").setText(stringizeNumber(this.dispDist()));
     this.textByName("tick.text").setText(stringizeNumber(this.world.restTick));
     this.textByName("fire.text").setText(`${this.world.firedCount}`)
+    this.textByName("kill.text").setText(`${this.world.killCount}`)
   }
   upudatePlayer() {
     const { width, height } = this.canvas();
@@ -365,11 +361,17 @@ export class Main extends BaseScene {
   }
   showWelcomeBack() {
     const { width, height } = this.canvas()
-    this.add.text(width * 0.5, height * 0.6, "Welcome Back!", {
+    const wb = this.add.text(width * 0.5, height * 0.6, "Welcome Back!", {
       fontFamily: "serif",
       fontStyle: "Bold",
       fontSize: 60,
     }).setDepth(depth.text).setOrigin(0.5, 0.5).setShadow(3, 3, "black")
+    const wbB = wb.getBounds()
+    this.add.text(width * 0.5, wbB.top - 100, `Score: ${this.world.score}pts.`, {
+      fontFamily: "serif",
+      fontStyle: "Bold",
+      fontSize: 40,
+    }).setDepth(depth.text).setOrigin(0.5, 1).setShadow(3, 3, "black")
   }
   update() {
     if (this.cleared || this.world.isGameOver) {

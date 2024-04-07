@@ -63,6 +63,10 @@ export class Enemy extends Mobj {
   get isLiving(): boolean {
     return this.secSinceDeath < 0
   }
+  get isKilled(): boolean {
+    return 0 <= this.secSinceDeath
+  }
+
   setKilled() {
     if (this.isLiving) {
       this.secSinceDeath = 0
@@ -110,6 +114,7 @@ export class World {
   _goal = { rad: 120, xy: new XY(400, 0) }
   get goal() { return this._goal }
   firedCount: number = 0
+  killCount: number = 0
   restTick: number = 100
   player: PlayerType = new PlayerType()
   enemies: Set<Enemy> = new Set<Enemy>();
@@ -181,10 +186,11 @@ export class World {
         const p0 = b.p.subP(e.p)
         const p1 = b.pOld.subP(e.pOld)
         const seg = new Segment(p0, p1)
-        if (seg.dist() < e.rad + b.rad) {
+        if (seg.dist() < e.rad + b.rad && e.isLiving) {
           this.addBrokens(e)
           b.decPower()
           e.setKilled()
+          this.killCount++;
         }
       })
       enemies.add(e)
@@ -193,6 +199,9 @@ export class World {
   }
   get isGameOver(): boolean {
     return this.player.killed || this.restTick <= 0
+  }
+  get score(): integer {
+    return Math.round(this.restTick * 10 + (this.killCount * 10000 + 100) / (this.firedCount + 10))
   }
   update(dt: number, slc: number) {
     if (this.isGameOver) {
