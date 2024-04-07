@@ -42,9 +42,9 @@ const e3 = (pos: XY, velo: XY, fric: number): enemy_t => {
   };
 }
 
-const e4 = (pos: XY, velo: number): enemy_t => {
+const e4 = (pos: XY): enemy_t => {
   const th = 200
-  const forget = 0.98
+  const velo = 200
   return {
     p: pos, v: XY.zero(), r: 0, vr: 1, im: 4, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
       const vec = p.subP(ep)
@@ -52,7 +52,7 @@ const e4 = (pos: XY, velo: number): enemy_t => {
         return { v: XY.zero() }
       }
       const dir = vec.atan2()
-      return { v: XY.rt(velo, dir).addP(ev.mul(forget)) }
+      return { v: XY.rt(velo, dir).mulAdd(ev, -1 / 4) }
     }
   };
 }
@@ -143,8 +143,8 @@ export const stages: (() => stage_t)[] = [
   },
   /* 5 */ () => {
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
-        return e4(XY.xy(150 + (i % 2) * 100, (i - 5.5) * 100), (i + 1) * 1)
+      goal: XY.rt(-600, 0), enemies: [...range(0, 11)].map((i) => {
+        return e4(XY.xy(-200 - (i % 2) * 100, (i - 5.5) * 100 + (i < 6 ? -100 : 100)))
       })
     }
   },
