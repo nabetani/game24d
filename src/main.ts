@@ -93,6 +93,7 @@ export class Main extends BaseScene {
     d.setScale(120 / d.width)
     const dB = d.getBounds()
     d.setText("")
+    //
     const ru = this.add.text(dB.left - 20, dB.bottom, "秒", {
       fontFamily: "sans-serif",
       ...style,
@@ -105,8 +106,24 @@ export class Main extends BaseScene {
       ...style
     }).setOrigin(1, 1).setDepth(depth.text).setName("tick.text")
     r.setScale(d.scale)
+    const rB = r.getBounds()
     r.setText("")
+    //
+    const fu = this.add.text(rB.left - 20, rB.bottom, "発", {
+      fontFamily: "sans-serif",
+      ...style,
+    }).setOrigin(1, 1).setDepth(depth.text).setName("funit.text")
+    fu.setScale(du.scale)
+    const fuB = fu.getBounds()
+    const f = this.add.text(fuB.left, fuB.bottom, "1000", {
+      align: "right",
+      fontFamily: "monospace",
+      ...style
+    }).setOrigin(1, 1).setDepth(depth.text).setName("fire.text")
+    f.setScale(d.scale)
+    f.setText("")
   }
+
 
   create(data: { stage: number }) {
     console.log(data);
@@ -325,6 +342,7 @@ export class Main extends BaseScene {
   upudateText() {
     this.textByName("dist.text").setText(stringizeNumber(this.dispDist()));
     this.textByName("tick.text").setText(stringizeNumber(this.world.restTick));
+    this.textByName("fire.text").setText(`${this.world.firedCount}`)
   }
   upudatePlayer() {
     const { width, height } = this.canvas();

@@ -109,6 +109,7 @@ export class PlayerType extends Mobj {
 export class World {
   _goal = { rad: 120, xy: new XY(400, 0) }
   get goal() { return this._goal }
+  firedCount: number = 0
   restTick: number = 100
   player: PlayerType = new PlayerType()
   enemies: Set<Enemy> = new Set<Enemy>();
@@ -217,6 +218,7 @@ export class World {
     return Math.min(1, (this.gunCharge[gunId] ?? 0))
   }
   fire(gunId: integer) {
+    this.firedCount++
     const ch = this.charged(gunId)
     this.gunCharge[gunId] = null
     const b = new Bullet(ch)
