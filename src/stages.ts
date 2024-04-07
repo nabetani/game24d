@@ -32,6 +32,33 @@ const e2 = (pos: XY, velo: XY, fric: number): enemy_t => {
   };
 }
 
+const e3 = (pos: XY, velo: XY, fric: number): enemy_t => {
+  let prev: XY = XY.zero()
+  const forget = 1 - 1 / 50
+  return {
+    p: pos, v: velo, r: 0, vr: 1, im: 3, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+      const dir = p.subP(ep).atan2()
+      return { v: XY.rt(fric, dir).addP(ev.mul(forget)) }
+    }
+  };
+}
+
+const e4 = (pos: XY, fric: number): enemy_t => {
+  let prev: XY = XY.zero()
+  const th = 200
+  const forget = 0.98
+  return {
+    p: pos, v: XY.zero(), r: 0, vr: 1, im: 3, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+      const vec = p.subP(ep)
+      if (th < vec.norm) {
+        return { v: XY.zero() }
+      }
+      const dir = vec.atan2()
+      return { v: XY.rt(fric, dir).addP(ev.mul(forget)) }
+    }
+  };
+}
+
 export const stages: (() => stage_t)[] = [
   /* 0 */ () => { throw "" },
 
@@ -52,6 +79,21 @@ export const stages: (() => stage_t)[] = [
       goal: XY.rt(600, 0), enemies: [...range(0, 4)].map((i) =>
         e2(XY.ra(200, 0 + 90 * i), XY.ra(100, 90 + 90 * i), 3 ** i * 0.3),
       )
+    }
+  },
+  /* 4 */ () => {
+    return {
+      goal: XY.rt(600, 0), enemies: [...range(0, 4)].map((i) => {
+        const a = 90 * i + 45;
+        return e3(XY.ra(200, 0 + a), XY.ra(400, 90 + a), (i + 1) * 1)
+      })
+    }
+  },
+  /* 5 */ () => {
+    return {
+      goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
+        return e4(XY.xy(150 + (i % 2) * 100, (i - 5.5) * 100), (i + 1) * 1)
+      })
     }
   },
 ];
