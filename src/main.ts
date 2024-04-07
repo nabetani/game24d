@@ -54,6 +54,8 @@ const stringizeDist = (d: number): string => {
 const enemyImageCount = 7
 
 export class Main extends BaseScene {
+  restTick: number = 100
+  started: boolean = false
   starLayerCount: number = 6
   prevTick: number = getTickSec()
   updateCount: integer = 0
@@ -107,6 +109,7 @@ export class Main extends BaseScene {
 
   create(data: { stage: number }) {
     console.log(data);
+    this.restTick = 100
     const { width, height } = this.canvas();
     this.world = new World()
     this.world.init(data.stage)
@@ -122,21 +125,37 @@ export class Main extends BaseScene {
     this.add.graphics().setName("pbone").setDepth(depth.player + 1)
     this.add.graphics().setName("charge").setDepth(depth.player)
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
+    const inputDown = (ix: 1 | 0) => {
+      this.started = true
+      this.world.inputDown(ix)
+    }
+    const inputUp = (ix: 1 | 0) => {
+      this.started = true
+      this.world.inputUp(ix)
+    }
     {
       const kb = this.input!.keyboard!
-      kb.on('keydown-RIGHT', () => this.world.inputDown(0));
-      kb.on('keydown-LEFT', () => this.world.inputDown(1));
-      kb.on('keyup-RIGHT', () => this.world.inputUp(0));
-      kb.on('keyup-LEFT', () => this.world.inputUp(1));
+      kb.on('keydown-RIGHT', () => inputDown(0));
+      kb.on('keydown-LEFT', () => inputDown(1));
+      kb.on('keyup-RIGHT', () => inputUp(0));
+      kb.on('keyup-LEFT', () => inputUp(1));
     }
     const zones = [
       this.add.zone(width, height / 2, width, height),
       this.add.zone(0, height / 2, width, height)]
-    zones.forEach((z, ix) => {
+    zones.forEach((z, ix0) => {
+      const ix = ix0 == 0 ? 0 : 1
       z.setInteractive()
-      z.on("pointerdown", () => { this.world.inputDown(ix) });
-      z.on("pointerup", () => { this.world.inputUp(ix) });
+      z.on("pointerdown", () => { inputDown(ix) });
+      z.on("pointerup", () => { inputUp(ix) });
     })
+    this.updateGameObjects()
+  }
+  updateGameObjects() {
+    this.updateBG()
+    this.upudateObjcts()
+    this.upudatePlayer()
+    this.upudateText()
   }
   updateBG() {
     const w = 900
@@ -248,7 +267,6 @@ export class Main extends BaseScene {
           }
         }
       })
-
     }
     for (const b of this.world.bullets) {
       const g = this.gpos(cos, sin, b.p)
@@ -337,19 +355,19 @@ export class Main extends BaseScene {
   }
   update() {
     if (this.cleared) {
-    } else {
+    } else if (this.started) {
       ++this.updateCount
       const dtReal = getTickSec() - this.prevTick
       this.dtHist = [dtReal, ...this.dtHist.slice(0, 4)]
-      const dtMax = Math.max(...this.dtHist)
+      const dtMax = Math.min(...this.dtHist)
       const dt = Math.min(1 / 20, dtReal)
-      this.starLayerCount = clamp(6 / 30 / dtMax, 1, this.starLayerCount)
+      this.restTick -= dt
+      if (4 < this.dtHist.length) {
+        this.starLayerCount = clamp(6 / 30 / dtMax, 1, this.starLayerCount)
+      }
       console.log({ dtMaxInv: 1 / dtMax, dtHist: this.dtHist, dtinv: 1 / dt, starLayerCount: this.starLayerCount })
       this.world.update(dt, this.starLayerCount)
-      this.updateBG()
-      this.upudateObjcts()
-      this.upudatePlayer()
-      this.upudateText()
+      this.updateGameObjects()
       this.prevTick += dtReal
       this.cleared = this.dispDist() <= 0
       if (this.cleared) {
