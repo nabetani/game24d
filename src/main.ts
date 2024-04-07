@@ -26,35 +26,19 @@ const divmod = (n: number, d: number): { q: number, r: number } => {
   return { q: q, r: r }
 }
 
-const stringizeDist = (d: number): string => {
-  if (d <= 0) {
-    return "0"
+const stringizeNumber = (d: number): string => {
+  if (d < 0) {
+    return "0.0"
   }
-  const p = Math.max(0, Math.log10(d))
-  if (5.999 < p) { return "測定不能" }
-  const n = Math.ceil(p);
-  let r = "";
-  for (const i of range(0, 10)) {
-    const x = n - i
-    const s = Math.floor(d / 10 ** x);
-    if (x === -1) {
-      r += (r === "" ? "0." : ".")
-    }
-    if (s != 0 || r !== "") {
-      r += `${s}`
-    }
-    d -= s * 10 ** x
-    if (5 < r.length && x <= 0) {
-      break
-    }
-  }
-  return r;
+  const n = Math.round(d * 10)
+  const f = n % 10
+  const i = (n - f) / 10
+  return `${i}.${f}`
 }
 
 const enemyImageCount = 7
 
 export class Main extends BaseScene {
-  restTick: number = 100
   started: boolean = false
   starLayerCount: number = 6
   prevTick: number = getTickSec()
@@ -90,26 +74,42 @@ export class Main extends BaseScene {
   }
   addTexts() {
     const style = {
-      fontSize: 50,
+      fontSize: 20,
+      stroke: "black",
+      strokeThickness: 5,
+
     };
-    const u = this.add.text(250, 30, "宇宙デニール", {
+    const du = this.add.text(500, 50, "宇宙デニール", {
       fontFamily: "sans-serif",
       ...style
-    }).setName("unit.text").setDepth(depth.text)
-    u.setScale(200 / u.width)
-    const ub = u.getBounds()
-    const d = this.add.text(ub.left - 20, ub.bottom, "0.400000", {
+    }).setName("dunit.text").setDepth(depth.text)
+    du.setScale(120 / du.width).setOrigin(1, 1)
+    const duB = du.getBounds()
+    const d = this.add.text(duB.left, duB.bottom, "0.400000", {
       align: "right",
       fontFamily: "monospace",
       ...style
     }).setOrigin(1, 1).setDepth(depth.text).setName("dist.text")
-    d.setScale(200 / d.width)
+    d.setScale(120 / d.width)
+    const dB = d.getBounds()
     d.setText("")
+    const ru = this.add.text(dB.left - 20, dB.bottom, "秒", {
+      fontFamily: "sans-serif",
+      ...style,
+    }).setOrigin(1, 1).setDepth(depth.text).setName("tunit.text")
+    ru.setScale(du.scale)
+    const ruB = ru.getBounds()
+    const r = this.add.text(ruB.left, ruB.bottom, "100.0", {
+      align: "right",
+      fontFamily: "monospace",
+      ...style
+    }).setOrigin(1, 1).setDepth(depth.text).setName("tick.text")
+    r.setScale(d.scale)
+    r.setText("")
   }
 
   create(data: { stage: number }) {
     console.log(data);
-    this.restTick = 100
     const { width, height } = this.canvas();
     this.world = new World()
     this.world.init(data.stage)
@@ -323,8 +323,8 @@ export class Main extends BaseScene {
   }
 
   upudateText() {
-    const t = this.textByName("dist.text");
-    t.setText(stringizeDist(this.dispDist()));
+    this.textByName("dist.text").setText(stringizeNumber(this.dispDist()));
+    this.textByName("tick.text").setText(stringizeNumber(this.world.restTick));
   }
   upudatePlayer() {
     const { width, height } = this.canvas();
@@ -354,14 +354,13 @@ export class Main extends BaseScene {
     }).setDepth(depth.text).setOrigin(0.5, 0.5).setShadow(3, 3, "black")
   }
   update() {
-    if (this.cleared) {
+    if (this.cleared || this.world.isGameOver) {
     } else if (this.started) {
       ++this.updateCount
       const dtReal = getTickSec() - this.prevTick
       this.dtHist = [dtReal, ...this.dtHist.slice(0, 4)]
       const dtMax = Math.min(...this.dtHist)
       const dt = Math.min(1 / 20, dtReal)
-      this.restTick -= dt
       if (4 < this.dtHist.length) {
         this.starLayerCount = clamp(6 / 30 / dtMax, 1, this.starLayerCount)
       }

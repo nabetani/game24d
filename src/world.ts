@@ -109,6 +109,7 @@ export class PlayerType extends Mobj {
 export class World {
   _goal = { rad: 120, xy: new XY(400, 0) }
   get goal() { return this._goal }
+  restTick: number = 100
   player: PlayerType = new PlayerType()
   enemies: Set<Enemy> = new Set<Enemy>();
   brokens: Set<Broken> = new Set<Broken>()
@@ -189,10 +190,14 @@ export class World {
     })
     this.enemies = enemies
   }
+  get isGameOver(): boolean {
+    return this.player.killed || this.restTick <= 0
+  }
   update(dt: number, slc: number) {
-    if (this.player.killed) {
+    if (this.isGameOver) {
       return
     }
+    this.restTick -= dt
     // console.log({ player_a: this.player.a.norm, player_v: this.player.v.norm })
     this.player.dev(dt)
     this.addCharge(0, dt)
