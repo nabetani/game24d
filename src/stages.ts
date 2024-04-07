@@ -77,6 +77,9 @@ const e5 = (pos: XY, range: number, a: number, f: number): enemy_t => {
 
 const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
   let tick = 0
+  const velo = 50
+  const th = 200
+  const forget = 0.8
   const move = (p: XY, ep: XY, ev: XY, dt: number): pva => {
     tick += dt
     const t = tick * f + (a * Math.PI / 180);
@@ -84,7 +87,6 @@ const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
     const y = Math.sin(t) * rad + pos.y
     return { p: XY.xy(x, y) }
   }
-  const velo = 100
   const chase = (p: XY, ep: XY, ev: XY, dt: number): pva => {
     const vec = p.subP(ep)
     if (th < vec.norm) {
@@ -96,8 +98,6 @@ const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
     return { v: XY.rt(velo, dir).addP(ev.mul(forget)) }
   }
   const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
-  const th = 200
-  const forget = 0.98
   let proc = move
   return {
     p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 6, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
