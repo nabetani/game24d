@@ -33,7 +33,6 @@ const e2 = (pos: XY, velo: XY, fric: number): enemy_t => {
 }
 
 const e3 = (pos: XY, velo: XY, fric: number): enemy_t => {
-  let prev: XY = XY.zero()
   const forget = 1 - 1 / 50
   return {
     p: pos, v: velo, r: 0, vr: 1, im: 3, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
@@ -43,8 +42,7 @@ const e3 = (pos: XY, velo: XY, fric: number): enemy_t => {
   };
 }
 
-const e4 = (pos: XY, fric: number): enemy_t => {
-  let prev: XY = XY.zero()
+const e4 = (pos: XY, velo: number): enemy_t => {
   const th = 200
   const forget = 0.98
   return {
@@ -54,7 +52,7 @@ const e4 = (pos: XY, fric: number): enemy_t => {
         return { v: XY.zero() }
       }
       const dir = vec.atan2()
-      return { v: XY.rt(fric, dir).addP(ev.mul(forget)) }
+      return { v: XY.rt(velo, dir).addP(ev.mul(forget)) }
     }
   };
 }
@@ -64,7 +62,7 @@ const e5 = (pos: XY, range: number, a: number, f: number): enemy_t => {
   const move = (p: XY, ep: XY, ev: XY, dt: number): pva => {
     tick += dt
     const t = tick * f + (a * Math.PI / 180);
-    const rt = t / 10
+    const rt = t / 7.1
     const x0 = Math.cos(t) * range
     const y0 = Math.sin(t) * range / 5
     const s = Math.sin(rt)
@@ -76,6 +74,42 @@ const e5 = (pos: XY, range: number, a: number, f: number): enemy_t => {
   const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
   return { p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 1, pva: move }
 }
+
+const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
+  let tick = 0
+  const move = (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    tick += dt
+    const t = tick * f + (a * Math.PI / 180);
+    const x = Math.cos(t) * rad + pos.x
+    const y = Math.sin(t) * rad + pos.y
+    return { p: XY.xy(x, y) }
+  }
+  const velo = 100
+  const chase = (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    const vec = p.subP(ep)
+    if (th < vec.norm) {
+      return {
+        v: XY.zero()
+      }
+    }
+    const dir = vec.atan2()
+    return { v: XY.rt(velo, dir).addP(ev.mul(forget)) }
+  }
+  const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
+  const th = 200
+  const forget = 0.98
+  let proc = move
+  return {
+    p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 6, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+      const vec = p.subP(ep)
+      if (vec.norm < th) {
+        proc = chase
+      }
+      return proc(p, ep, ev, dt)
+    }
+  };
+}
+
 
 export const stages: (() => stage_t)[] = [
   /* 0 */ () => { throw "" },
@@ -118,6 +152,13 @@ export const stages: (() => stage_t)[] = [
     return {
       goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
         return e5(XY.xy(150 + (i % 2) * 100, (i - 5.5) * 100), 30, 10, 10 + i * 7 % 11)
+      })
+    }
+  },
+  /* 7 */ () => {
+    return {
+      goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
+        return e6(XY.xy(0, 0), 300, 90 * i, 2)
       })
     }
   },
