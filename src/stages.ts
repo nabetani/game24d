@@ -48,7 +48,7 @@ const e4 = (pos: XY, fric: number): enemy_t => {
   const th = 200
   const forget = 0.98
   return {
-    p: pos, v: XY.zero(), r: 0, vr: 1, im: 3, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    p: pos, v: XY.zero(), r: 0, vr: 1, im: 4, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
       const vec = p.subP(ep)
       if (th < vec.norm) {
         return { v: XY.zero() }
@@ -57,6 +57,24 @@ const e4 = (pos: XY, fric: number): enemy_t => {
       return { v: XY.rt(fric, dir).addP(ev.mul(forget)) }
     }
   };
+}
+
+const e5 = (pos: XY, range: number, a: number, f: number): enemy_t => {
+  let tick = 0
+  const move = (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    tick += dt
+    const t = tick * f + (a * Math.PI / 180);
+    const rt = t / 10
+    const x0 = Math.cos(t) * range
+    const y0 = Math.sin(t) * range / 5
+    const s = Math.sin(rt)
+    const c = Math.cos(rt)
+    const x = x0 * c - y0 * s + pos.x
+    const y = x0 * s + y0 * c + pos.y
+    return { p: XY.xy(x, y) }
+  }
+  const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
+  return { p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 1, pva: move }
 }
 
 export const stages: (() => stage_t)[] = [
@@ -93,6 +111,13 @@ export const stages: (() => stage_t)[] = [
     return {
       goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
         return e4(XY.xy(150 + (i % 2) * 100, (i - 5.5) * 100), (i + 1) * 1)
+      })
+    }
+  },
+  /* 6 */ () => {
+    return {
+      goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
+        return e5(XY.xy(150 + (i % 2) * 100, (i - 5.5) * 100), 30, 10, 10 + i * 7 % 11)
       })
     }
   },
