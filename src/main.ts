@@ -57,6 +57,7 @@ export class Main extends BaseScene {
   starLayerCount: number = 6
   prevTick: number = getTickSec()
   updateCount: integer = 0
+  dtHist: number[] = [];
   world: World = new World()
   bgs: Phaser.GameObjects.Image[] = []
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
@@ -184,7 +185,7 @@ export class Main extends BaseScene {
       if (sv < 2) {
         sp.setVisible(false)
       } else {
-        console.log({ sv: sv })
+        // console.log({ sv: sv })
         sp.setVisible(true)
         sp.setScale(0.5 + sv / 10)
         const dir = this.world.player.v.atan2() - this.world.player.r - Math.PI / 2;
@@ -294,7 +295,7 @@ export class Main extends BaseScene {
       this.spriteByName(id).destroy()
     })
     this.objIDs = objIDs;
-    console.log("this.sys.displayList.length:", this.sys.displayList.length)
+    // console.log("this.sys.displayList.length:", this.sys.displayList.length)
   }
 
   dispDist(): number {
@@ -338,15 +339,18 @@ export class Main extends BaseScene {
     if (this.cleared) {
     } else {
       ++this.updateCount
-      const dt = getTickSec() - this.prevTick
-      this.starLayerCount = clamp(6 / 30 / dt, 1, this.starLayerCount)
-      console.log({ starLayerCount: this.starLayerCount })
+      const dtReal = getTickSec() - this.prevTick
+      this.dtHist = [dtReal, ...this.dtHist.slice(0, 4)]
+      const dtMax = Math.max(...this.dtHist)
+      const dt = Math.min(1 / 20, dtReal)
+      this.starLayerCount = clamp(6 / 30 / dtMax, 1, this.starLayerCount)
+      console.log({ dtMaxInv: 1 / dtMax, dtHist: this.dtHist, dtinv: 1 / dt, starLayerCount: this.starLayerCount })
       this.world.update(dt, this.starLayerCount)
       this.updateBG()
       this.upudateObjcts()
       this.upudatePlayer()
       this.upudateText()
-      this.prevTick += dt
+      this.prevTick += dtReal
       this.cleared = this.dispDist() <= 0
       if (this.cleared) {
         this.showWelcomeBack()
