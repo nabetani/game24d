@@ -17,7 +17,8 @@ const depth = {
   bullet: 120,
   arrowG: 180,
   arrowD: 190,
-  text: 200,
+  textbase: 200,
+  text: 201,
 }
 
 const divmod = (n: number, d: number): { q: number, r: number } => {
@@ -50,6 +51,18 @@ export class Main extends BaseScene {
   objIDs: Set<string> = new Set<string>();
   cleared: boolean = false
 
+  init() {
+    this.started = false
+    this.starLayerCount = 6
+    this.prevTick = getTickSec()
+    this.updateCount = 0
+    this.dtHist = [];
+    this.world = new World()
+    this.bgs = []
+    this.cursorInput = null
+    this.objIDs = new Set<string>();
+    this.cleared = false
+  }
   get player(): Phaser.GameObjects.Sprite {
     return this.spriteByName("player");
   }
@@ -123,9 +136,8 @@ export class Main extends BaseScene {
   create(data: { stage: number }) {
     console.log(data);
     const { width, height } = this.canvas();
-    this.world = new World()
+    this.init()
     this.world.init(data.stage)
-    this.prevTick = getTickSec()
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
     const starLayerCount = 6
     for (const ix of range(0, 9 * starLayerCount)) {
@@ -359,6 +371,34 @@ export class Main extends BaseScene {
       graphics.fillRect(x, y, w, h);
     }
   }
+
+  showGoToTitle() {
+    const { width, height } = this.canvas()
+    const gtt = this.add.text(0, height, "Go to TITLE", {
+      fontFamily: "sans-serif",
+      fontStyle: "Bold",
+      fontSize: 30,
+    }).setDepth(depth.text).setOrigin(0, 1).setShadow(3, 3, "black")
+    const b = gtt.getBounds()
+    const c = 5
+    const w = b.width + c
+    const h = b.height + c
+    const points = [0, 0,
+      w - c * 2, 0,
+      w, c * 2,
+      w, h,
+      0, h,
+      0, 0,
+    ]
+    const g = this.add.polygon(0, height, points, 0xffffff, 0.5).setOrigin(0, 1).setDepth(depth.textbase)
+    g.setInteractive()
+    g.on("pointerdown", () => { this.scene.start('Title') })
+  }
+
+  showGameOver() {
+    this.showGoToTitle()
+  }
+
   showWelcomeBack() {
     const { width, height } = this.canvas()
     const wb = this.add.text(width * 0.5, height * 0.6, "Welcome Back!", {
@@ -372,6 +412,7 @@ export class Main extends BaseScene {
       fontStyle: "Bold",
       fontSize: 40,
     }).setDepth(depth.text).setOrigin(0.5, 1).setShadow(3, 3, "black")
+    this.showGoToTitle()
   }
   update() {
     if (this.cleared || this.world.isGameOver) {
@@ -391,6 +432,9 @@ export class Main extends BaseScene {
       this.cleared = this.dispDist() <= 0
       if (this.cleared) {
         this.showWelcomeBack()
+      }
+      if (this.world.isGameOver) {
+        this.showGameOver()
       }
     }
   }
