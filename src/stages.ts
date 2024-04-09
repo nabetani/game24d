@@ -148,9 +148,13 @@ export const stages: (() => stage_t)[] = [
     }
   },
   /* 5 */ () => {
+    const n = 20
     return {
-      goal: XY.rt(-600, 0), enemies: [...range(0, 11)].map((i) => {
-        return e4(XY.xy(-200 - (i % 2) * 100, (i - 5.5) * 100 + (i < 6 ? -100 : 100)))
+      msg: "フルチャージで発射すると\n一発で敵を殲滅できます",
+      goal: XY.rt(-1000, 0), enemies: [...range(0, n)].map((i) => {
+        const av = Math.ceil(i / 2) / n
+        const v = av * (i % 2 ? -1 : 1)
+        return e1(XY.xy(0, 0), 200 + av * 150, -360 * v, v * 6)
       })
     }
   },
