@@ -122,23 +122,28 @@ export const stages: (() => stage_t)[] = [
   }),
   /* 2 */ () => {
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, 4)].map((i) =>
-        e1(XY.xy(0, 0), 200, 90 * i, 2),
-      )
+      msg: "チャージせずに発射して\n向きを変えます。\n回っている間にチャージして\n母星が真下になったら\nフルチャージの弾を発射しましょう。",
+      goal: XY.rt(600, 0), enemies: [...range(0, 3)].map((i) => {
+        return e0(XY.xy(250, (i - 1) * 200))
+      })
     }
   },
   /* 3 */ () => {
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, 4)].map((i) =>
-        e2(XY.ra(200, 0 + 90 * i), XY.ra(100, 90 + 90 * i), 3 ** i * 0.3),
-      )
+      msg: "そのまま母星に向かうと\n敵にぶつかってしまいます。\n敵を倒してから\n母星に向かいましょう。",
+      goal: XY.rt(-650, 0), enemies: [...range(0, 18)].map((i) => {
+        const x = i % 2
+        const y = (i - x) / 2
+        return e0(XY.xy(-300 + x * 80, (y - 4) * 80))
+      })
     }
   },
   /* 4 */ () => {
+    const n = 20
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, 4)].map((i) => {
-        const a = 90 * i + 45;
-        return e3(XY.ra(200, 0 + a), XY.ra(400, 90 + a), (i + 1) * 1)
+      msg: "左右の弾を同時に撃つことで\n自分の向きを変えずに\n敵を殲滅できます。",
+      goal: XY.rt(-650, 0), enemies: [...range(0, n)].map((i) => {
+        return e1(XY.xy(0, 0), 200, 360 * i / n, i % 2 ? -1 : 1)
       })
     }
   },

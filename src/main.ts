@@ -138,13 +138,12 @@ export class Main extends BaseScene {
         {
           fontSize: 30,
           lineSpacing: 20,
-          backgroundColor: "#000",
+          backgroundColor: "#0008",
           align: "center",
           padding: { x: 5, y: 5 },
         }).setOrigin(0.5, 0.5).setDepth(depth.text).setName("stage.text")
     }
   }
-
 
   create(data: { stage: number }) {
     console.log(data);
