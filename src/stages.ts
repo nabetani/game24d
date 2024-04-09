@@ -72,7 +72,7 @@ const e5 = (pos: XY, range: number, a: number, f: number): enemy_t => {
     return { p: XY.xy(x, y) }
   }
   const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
-  return { p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 1, pva: move }
+  return { p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 5, pva: move }
 }
 
 const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
@@ -159,16 +159,62 @@ export const stages: (() => stage_t)[] = [
     }
   },
   /* 6 */ () => {
+    const n = 10
+    const e = (i: number, a: number, f: number) => {
+      const av = Math.ceil(i / 2) / n
+      const v = av * (i % 2 ? -1 : 1)
+      return e1(XY.xy(0, 0), 200 + av * 150, a - 360 * v, v * f)
+    }
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
-        return e5(XY.xy(150 + (i % 2) * 100, (i - 5.5) * 100), 30, 10, 10 + i * 7 % 11)
-      })
+      msg: "左右同時にチャージを始め\n右→左の順に撃つと\n敵を殲滅のうえ\n母星に帰還できます。",
+      goal: XY.ra(-1000, 10), enemies: [...range(0, n * 2)].map((i) =>
+        i < n ? e(i, 0, 6) : e(i - n, 30, 4)
+      )
     }
   },
   /* 7 */ () => {
+    const n = 10
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, 11)].map((i) => {
-        return e6(XY.xy(0, 0), 300, 90 * i, 2)
+      msg: "右の砲を細かく撃ち\n右の敵を殲滅してから\n母星を目指すのが\nよさそうです。",
+      goal: XY.ra(600, 90), enemies: [...range(0, 2 * n)].map((i) => {
+        if (i < n) {
+          const k = i
+          return e2(XY.xy((k % 2) * 60, 250 + k * 60), XY.xy(0, -100), 0.5)
+        } else {
+          const k = i - n
+          return e0(XY.xy(k * 60, -(200 + k * 10)))
+        }
+      })
+    }
+  },
+  /* 8 */ () => {
+    const n = 7
+    return {
+      msg: "いろいろな敵がいます。\nGood luck!。",
+      goal: XY.rt(600, 0), enemies: [...range(0, n)].map((i) => {
+        const a = 360 * i / n - 40
+        const r = 300
+        const p = XY.ra(r, a)
+        switch (i % 7) {
+          default:
+            return e0(p)
+          case 2:
+          case 3:
+            return e1(XY.zero(), r, a, 2)
+          case 1: return e2(p, p.mul(-0.1), 1)
+          case 0: return e5(p, 50, 0, 10)
+        }
+      })
+    }
+  },
+  /* 9 */ () => {
+    const n = 10
+    return {
+      goal: XY.ra(600, 90), enemies: [...range(0, n)].map((i) => {
+        const a = 360 * (i - n / 2 + 0.5) / (n * 1.5)
+        const r = 300
+        const p = XY.ra(r, a)
+        return e2(p, p.mul(-0.3).addP(XY.xy(-50, 0)), 1)
       })
     }
   },
