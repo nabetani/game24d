@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { BaseScene } from './baseScene';
 import { World, PlayerType } from './world';
 import { XY, sincos, clamp, range } from './calc'
+import { stages } from './stages';
 
 const getTickSec = (): number => {
   return (new Date().getTime()) * 1e-3
@@ -85,7 +86,7 @@ export class Main extends BaseScene {
       this.load.image(`enemy${e}`, `assets/enemy${e}.webp`);
     }
   }
-  addTexts() {
+  addTexts(stageMsg: string | undefined) {
     const style = {
       fontSize: 20,
       stroke: "black",
@@ -130,6 +131,18 @@ export class Main extends BaseScene {
     const fB = numT("1000", "fire.text", fuB)
     const kuB = fixed("殺", fB)
     const kB = numT("100", "kill.text", kuB)
+    const { width, height } = this.canvas()
+    if (stageMsg) {
+      this.add.text(width / 2, height / 4,
+        stageMsg,
+        {
+          fontSize: 30,
+          lineSpacing: 20,
+          backgroundColor: "#000",
+          align: "center",
+          padding: { x: 5, y: 5 },
+        }).setOrigin(0.5, 0.5).setDepth(depth.text).setName("stage.text")
+    }
   }
 
 
@@ -144,13 +157,21 @@ export class Main extends BaseScene {
       const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
-    this.addTexts()
+    this.addTexts(stages[data.stage]().msg)
     this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.25).setName("player");
     this.add.graphics().setName("pbone").setDepth(depth.player + 1)
     this.add.graphics().setName("charge").setDepth(depth.player)
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
     const inputDown = (ix: 1 | 0) => {
-      this.started = true
+      if (!this.started) {
+        this.started = true
+        const o = this.sys.displayList.getByName("stage.text")
+        if (o) {
+          const t = o as Phaser.GameObjects.Text
+          o.destroy()
+        }
+      }
+
       this.world.inputDown(ix)
     }
     const inputUp = (ix: 1 | 0) => {

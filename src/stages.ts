@@ -3,7 +3,7 @@ import { XY, range } from './calc'
 type goal_t = XY
 export type pva = { p?: XY, v?: XY, a?: XY }
 type enemy_t = { p: XY, v: XY, r: number, vr?: number, im: number, pva?: (p: XY, ep: XY, ev: XY, tick: number) => pva }
-type stage_t = { goal: goal_t, enemies: enemy_t[] }
+type stage_t = { msg?: string, goal: goal_t, enemies: enemy_t[] }
 
 const e0 = (pos: XY): enemy_t => {
   return { p: pos, v: XY.xy(0, 0), r: 0, vr: 1, im: 0 }
@@ -115,6 +115,7 @@ export const stages: (() => stage_t)[] = [
   /* 0 */ () => { throw "" },
 
   /* 1 */ () => ({
+    msg: "チャージしてから発射すれば\nすぐに母星にたどり着けます。\nタップまたはカーソルキーで\nゲームスタートです。",
     goal: XY.rt(-400, 0), enemies: [
       e0(XY.xy(400, 0)),
     ]
