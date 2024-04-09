@@ -133,7 +133,7 @@ export class Main extends BaseScene {
     const kB = numT("100", "kill.text", kuB)
     const { width, height } = this.canvas()
     if (stageMsg) {
-      this.add.text(width / 2, height / 4,
+      const o = this.add.text(width / 2, height / 4,
         stageMsg,
         {
           fontSize: 30,
@@ -142,6 +142,9 @@ export class Main extends BaseScene {
           align: "center",
           padding: { x: 5, y: 5 },
         }).setOrigin(0.5, 0.5).setDepth(depth.text).setName("stage.text")
+      if (width < o.getBounds().width) {
+        o.setScale(width / o.getBounds().width)
+      }
     }
   }
 
@@ -174,7 +177,6 @@ export class Main extends BaseScene {
       this.world.inputDown(ix)
     }
     const inputUp = (ix: 1 | 0) => {
-      this.started = true
       this.world.inputUp(ix)
     }
     {
