@@ -218,4 +218,13 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
+  /* 10 */ () => {
+    const n = 20
+    return {
+      goal: XY.rt(-650, 0), enemies: [...range(0, n)].map((i) => {
+        const a = 360 / n * i
+        return e3(XY.ra(330, a), XY.ra(-100, a + 90), 0.9)
+      })
+    }
+  },
 ];
