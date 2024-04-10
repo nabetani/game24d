@@ -141,7 +141,7 @@ export const stages: (() => stage_t)[] = [
   /* 4 */ () => {
     const n = 20
     return {
-      msg: "左右の弾を同時に撃つことで\n自分の向きを変えずに\n敵を殲滅できます。",
+      msg: "チャージせずに何度も\n左右の弾を同時に撃つことで\n自分の向きを変えずに\n敵を殲滅できます。",
       goal: XY.rt(-650, 0), enemies: [...range(0, n)].map((i) => {
         return e1(XY.xy(0, 0), 200, 360 * i / n, i % 2 ? -1 : 1)
       })
@@ -190,7 +190,7 @@ export const stages: (() => stage_t)[] = [
   /* 8 */ () => {
     const n = 7
     return {
-      msg: "いろいろな敵がいます。\nGood luck!。",
+      msg: "いろいろな種類の敵がいます。\nGood luck!。",
       goal: XY.rt(600, 0), enemies: [...range(0, n)].map((i) => {
         const a = 360 * i / n - 40
         const r = 300
