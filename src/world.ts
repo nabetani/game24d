@@ -237,6 +237,7 @@ export class World {
     b.p.incByDir(this.player.r + 0.4 * [1, -1][gunId], 32)
     b.v = this.player.v.dup()
     b.v.incByDir(this.player.r, 200 * (1 + b.power * 3))
+    b.p.incByDir(b.v.atan2(), b.rad)
 
     this.player.ar += [1, -1][gunId] * (0.1 + b.power * 3)
     this.player.a.incByDir(this.player.r, -100 * (0.1 + 10 * b.power ** 2))
