@@ -227,4 +227,23 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
+  /* 11 */ () => {
+    const n = 20
+    return {
+      goal: XY.rt(-650, 0), enemies: [...range(0, n)].map((i) => {
+        const a = 360 / n * i * 2
+        return e4(XY.ra(250 + a / 5, a))
+      })
+    }
+  },
+  /* 27 */ () => {
+    const n = 20
+    return {
+      goal: XY.rt(600, 0), enemies: [...range(0, n)].map((i) => {
+        const a = 360 / n * i
+        const r = 200
+        return e1(XY.ra(r, a), r, a, 0.12 * (i / n + 4))
+      })
+    }
+  },
 ];
