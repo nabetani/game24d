@@ -236,6 +236,26 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
+  /* 12 */ () => {
+    const n = 16
+    return {
+      goal: XY.rt(650, 0), enemies: [...range(-3, n)].map((i) => {
+        if (i < 0) {
+          return e0(XY.xy(-150, (i + 2) * 120))
+        } else {
+          const x = i % 4
+          const y = Math.floor(i / 4)
+          const p = XY.xy(x + 2, y - 1.5).mul(120)
+          const ph = p.mul(0.5)
+          const sig = p.y < 0 ? 1 : -1
+          const c = ph.add(sig * p.y, sig * -p.x)
+          const v = p.subP(c)
+          const a = v.atan2() * 180 / Math.PI
+          return e1(c, v.norm, a, sig / (4 + x))
+        }
+      })
+    }
+  },
   /* 27 */ () => {
     const n = 20
     return {
