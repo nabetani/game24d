@@ -256,6 +256,46 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
+  /* 13 */ () => {
+    const n = 16
+    return {
+      goal: XY.rt(650, 0), enemies: [...range(0, n)].map((i) => {
+        const t = 360 * i / n
+        return e5(XY.ra(200, t), 100, t ** 2, 4)
+      })
+    }
+  },
+  /* 14 */ () => {
+    const n = 15
+    return {
+      goal: XY.rt(650, 0), enemies: [...range(0, n)].map((i) => {
+        const k = i % 8
+        if (i == k) {
+          const t = 180 * (k / (8 - 1) - 0.5)
+          return e2(XY.ra(230, t), XY.ra(-200, t), 0.1)
+        }
+        const t = 180 * ((k + 0.5) / (8 - 1) - 0.5)
+        return e3(XY.ra(280, t), XY.ra(-200, t), 0.1)
+      })
+    }
+  },
+  /* 15 */ () => {
+    const n = 15
+    return {
+      goal: XY.rt(650, 0), enemies: [...range(-1, n)].map((i) => {
+        if (i < 0) {
+          return e0(XY.xy(-250, 0))
+        }
+        const k = i % 8
+        if (i == k) {
+          const t = 180 * (k / (8 - 1) - 0.5)
+          return e2(XY.ra(280, t), XY.ra(-200, t), 0.1)
+        }
+        const t = 180 * ((k + 0.5) / (8 - 1) - 0.5)
+        return e3(XY.ra(220, t), XY.ra(-200, t), 0.1)
+      })
+    }
+  },
   /* 27 */ () => {
     const n = 20
     return {
