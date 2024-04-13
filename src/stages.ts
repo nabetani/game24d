@@ -374,4 +374,17 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
+  /* 24 */ () => {
+    const gx = 800
+    const gy = 0
+    const n = 8
+    const c = (n / 2 - 1) / 2
+    return {
+      goal: XY.xy(gx, gy), enemies: [...range(0, n)].map(i => {
+        const ix = i % 2
+        const iy = (i - ix) / 2 - c
+        return e6(XY.xy((ix - 0.5) * 410, (iy + (iy < 0 ? -1 : 1)) * 80), 0, 0, 0.5)
+      })
+    }
+  },
 ];
