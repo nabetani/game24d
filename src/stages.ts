@@ -330,4 +330,10 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
+  /* 19 */ () => {
+    const f = (r: number, n: number, a: number) => [...range(0, n)].map((i) => {
+      return e2(XY.ra(r, -100 + 320 / n * i), XY.zero(), 0.1)
+    })
+    return { goal: XY.rt(650, 0), enemies: [...f(170, 10, 0.5), ...f(200, 13, 0.4)] }
+  },
 ];
