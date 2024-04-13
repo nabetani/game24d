@@ -150,7 +150,7 @@ export const stages: (() => stage_t)[] = [
   /* 5 */ () => {
     const n = 20
     return {
-      msg: "フルチャージで発射すると\n一発で敵を殲滅できます",
+      msg: "タイミングよく\nフルチャージで発射すると\n一発で敵を殲滅できます",
       goal: XY.rt(-1000, 0), enemies: [...range(0, n)].map((i) => {
         const av = Math.ceil(i / 2) / n
         const v = av * (i % 2 ? -1 : 1)
@@ -231,12 +231,22 @@ export const stages: (() => stage_t)[] = [
     const n = 20
     return {
       goal: XY.rt(-650, 0), enemies: [...range(0, n)].map((i) => {
-        const a = 360 / n * i * 2
-        return e4(XY.ra(250 + a / 5, a))
+        const a = 360 / n * i
+        return e4(XY.ra(250, a))
       })
     }
   },
   /* 12 */ () => {
+    const n = 20
+    return {
+      goal: XY.rt(600, 0), enemies: [...range(0, n)].map((i) => {
+        const a = 360 / n * i
+        const r = 120
+        return e1(XY.ra(r, a), r, a, 0.12 * (i / n + 4))
+      })
+    }
+  },
+  /* 13 */ () => {
     const n = 16
     return {
       goal: XY.rt(650, 0), enemies: [...range(-3, n)].map((i) => {
@@ -256,7 +266,7 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
-  /* 13 */ () => {
+  /* 14 */ () => {
     const n = 16
     return {
       goal: XY.rt(650, 0), enemies: [...range(0, n)].map((i) => {
@@ -265,7 +275,7 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
-  /* 14 */ () => {
+  /* 15 */ () => {
     const n = 15
     return {
       goal: XY.rt(650, 0), enemies: [...range(0, n)].map((i) => {
@@ -279,7 +289,7 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
-  /* 15 */ () => {
+  /* 16 */ () => {
     const n = 15
     return {
       goal: XY.rt(650, 0), enemies: [...range(-1, n)].map((i) => {
@@ -296,13 +306,27 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
-  /* 27 */ () => {
+  /* 17 */ () => {
     const n = 20
     return {
-      goal: XY.rt(600, 0), enemies: [...range(0, n)].map((i) => {
-        const a = 360 / n * i
-        const r = 200
-        return e1(XY.ra(r, a), r, a, 0.12 * (i / n + 4))
+      goal: XY.rt(650, 0), enemies: [...range(0, n)].map((i) => {
+        const r = 240
+        const y = [-1, 1][i % 2] * (r + 60)
+        return e1(XY.xy(y * 0.6, y * 0.8), r, 360 * i / n, 4)
+      })
+    }
+  },
+  /* 18 */ () => {
+    const n = 30
+    return {
+      goal: XY.rt(650, 0), enemies: [...range(0, n)].map((i) => {
+        const r = 240
+        const y = [-1, 1, 0][i % 3] * (r + 50)
+        if (y == 0) {
+          return e1(XY.xy(-350, 0), r, 360 * i / n, 4)
+        } else {
+          return e1(XY.xy(y * 0.6, y * 0.8), r, 360 * i / n, 4)
+        }
       })
     }
   },
