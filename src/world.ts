@@ -48,10 +48,9 @@ export class Bullet extends Mobj {
     return this.power * 60 + 10
   }
   decPower() {
-    const p = this._power
     const e = 1.4
-    this._power = Math.max(0, p ** e - 0.02) ** (1 / e)
-    console.log({ pow0: p, pow1: this._power })
+    const f = (p: number): number => Math.max(0, p ** e - 0.02) ** (1 / e)
+    this._power = f(f(this._power))
   }
 }
 
@@ -239,7 +238,7 @@ export class World {
     b.v.incByDir(this.player.r, 200 * (1 + b.power * 3))
     b.p.incByDir(b.v.atan2(), b.rad)
 
-    this.player.ar += [1, -1][gunId] * (0.1 + b.power * 3)
+    this.player.ar += 3 * [1, -1][gunId] * (0.1 + b.power * 2)
     this.player.a.incByDir(this.player.r, -100 * (0.1 + 10 * b.power ** 2))
     this.bullets.push(b)
   }
