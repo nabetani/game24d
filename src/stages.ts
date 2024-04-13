@@ -80,6 +80,7 @@ const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
   const velo = 50
   const th = 200
   const forget = 0.8
+  let p0: XY = XY.zero()
   const move = (p: XY, ep: XY, ev: XY, dt: number): pva => {
     tick += dt
     const t = tick * f + (a * Math.PI / 180);
@@ -88,12 +89,9 @@ const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
     return { p: XY.xy(x, y) }
   }
   const chase = (p: XY, ep: XY, ev: XY, dt: number): pva => {
-    const vec = p.subP(ep)
-    if (th < vec.norm) {
-      return {
-        v: XY.zero()
-      }
-    }
+    const t = p.subP(ep).norm / velo / 10
+    const pExp = p.addP(p.subP(p0).mul(t / dt))
+    const vec = pExp.subP(ep)
     const dir = vec.atan2()
     return { v: XY.rt(velo, dir).addP(ev.mul(forget)) }
   }
@@ -105,7 +103,9 @@ const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
       if (vec.norm < th) {
         proc = chase
       }
-      return proc(p, ep, ev, dt)
+      const r = proc(p, ep, ev, dt)
+      p0 = p
+      return r
     }
   };
 }
@@ -335,5 +335,43 @@ export const stages: (() => stage_t)[] = [
       return e2(XY.ra(r, -100 + 320 / n * i), XY.zero(), 0.1)
     })
     return { goal: XY.rt(650, 0), enemies: [...f(170, 10, 0.5), ...f(200, 13, 0.4)] }
+  },
+  /* 20 */ () => {
+    const n = 8
+    return {
+      goal: XY.ra(10000, 100), enemies: [...range(0, n)].map((i) => {
+        return e1(XY.xy(0, 0), 200, 360 * i / n, 3)
+      })
+    }
+  },
+  /* 21 */ () => {
+    const f = (x: number, y: number, n: number, r: number): enemy_t[] => [...range(0, n)].map((i) => {
+      return e1(XY.xy(x, y), r, 360 * i / n, 3)
+    })
+    const gx = -300
+    const gy = -600
+    return {
+      goal: XY.xy(gx, gy), enemies: [...f(0, 0, 3, 200), ...f(gx, gy, 20, 320)]
+    }
+  },
+  /* 22 */ () => {
+    const f = (x: number, y: number, n: number, r: number): enemy_t[] => [...range(0, n)].map((i) => {
+      return e1(XY.xy(x, y), r, 360 * i / n, 3)
+    })
+    const gx = -300
+    const gy = -2000
+    return {
+      goal: XY.xy(gx, gy), enemies: [...f(0, 0, 3, 200), ...f(gx, gy, 20, 320)]
+    }
+  },
+  /* 23 */ () => {
+    const gx = -800
+    const gy = 0
+    const n = 8
+    return {
+      goal: XY.xy(gx, gy), enemies: [...range(0, n)].map(i => {
+        return e6(XY.zero(), 400, 360 / n * i, 0.5)
+      })
+    }
   },
 ];
