@@ -394,16 +394,16 @@ export class Main extends BaseScene {
     }
   }
 
-  showGoToTitle() {
+  gotoTitleUI() {
     const { width, height } = this.canvas()
-    const gtt = this.add.text(0, height, "Go to TITLE", {
+    const gtt = this.add.text(10, height, "Go to TITLE", {
       fontFamily: "sans-serif",
       fontStyle: "Bold",
       fontSize: 30,
     }).setDepth(depth.text).setOrigin(0, 1).setShadow(3, 3, "black")
     const b = gtt.getBounds()
     const c = 5
-    const w = b.width + c
+    const w = b.width + 20 + c
     const h = b.height + c
     const points = [0, 0,
       w - c * 2, 0,
@@ -412,13 +412,60 @@ export class Main extends BaseScene {
       0, h,
       0, 0,
     ]
-    const g = this.add.polygon(0, height, points, 0xffffff, 0.5).setOrigin(0, 1).setDepth(depth.textbase)
+    const g = this.add.polygon(0, height, points, 0, 0.5).setOrigin(0, 1).setDepth(depth.textbase)
     g.setInteractive()
     g.on("pointerdown", () => { this.scene.start('Title') })
   }
 
+  retryUI() {
+    const { width, height } = this.canvas()
+    const gtt = this.add.text(width - 10, height, "Retry", {
+      fontFamily: "sans-serif",
+      fontStyle: "Bold",
+      fontSize: 30,
+    }).setDepth(depth.text).setOrigin(1, 1).setShadow(3, 3, "black")
+    const b = gtt.getBounds()
+    const c = 5
+    const w = b.width + 20 + c
+    const h = b.height + c
+    const points = [0, 0,
+      -(w - c * 2), 0,
+      -w, c * 2,
+      -w, h,
+      0, h,
+      0, 0,
+    ]
+    const g = this.add.polygon(width, height, points, 1, 0.5).setOrigin(0, 1).setDepth(depth.textbase)
+    const z = this.add.zone(width - w, height - h, w, h).setOrigin(0, 0)
+    z.setInteractive()
+    z.on("pointerdown", () => { this.scene.start('Main') })
+  }
+  endGameUI() {
+    this.gotoTitleUI()
+    this.retryUI()
+  }
+
   showGameOver() {
-    this.showGoToTitle()
+    const { width, height } = this.canvas()
+    const go = this.add.text(width * 0.5, height * 0.6, "Game Over", {
+      fontFamily: "sans-serif",
+      fontStyle: "Bold",
+      fontSize: 60,
+    }).setDepth(depth.text).setOrigin(0.5, 0.5).setShadow(3, 3, "black")
+    if (this.world.restTick <= 0) {
+      const msg = "生命維持装置が機能停止しました."
+      const goB = go.getBounds()
+      const m = this.add.text(width * 0.5, goB.top - 100, msg, {
+        fontFamily: "sans-serif",
+        fontStyle: "Bold",
+        fontSize: 30,
+      }).setDepth(depth.text).setOrigin(0.5, 1).setShadow(3, 3, "black")
+      const wmax = width * 0.95
+      if (wmax < m.width) {
+        m.setScale(wmax / m.width)
+      }
+    }
+    this.endGameUI()
   }
 
   showWelcomeBack() {
@@ -434,7 +481,7 @@ export class Main extends BaseScene {
       fontStyle: "Bold",
       fontSize: 40,
     }).setDepth(depth.text).setOrigin(0.5, 1).setShadow(3, 3, "black")
-    this.showGoToTitle()
+    this.endGameUI()
   }
   update() {
     if (this.cleared || this.world.isGameOver) {
