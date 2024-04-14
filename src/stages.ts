@@ -355,16 +355,6 @@ export const stages: (() => stage_t)[] = [
     }
   },
   /* 22 */ () => {
-    const f = (x: number, y: number, n: number, r: number): enemy_t[] => [...range(0, n)].map((i) => {
-      return e1(XY.xy(x, y), r, 360 * i / n, 3)
-    })
-    const gx = -300
-    const gy = -2000
-    return {
-      goal: XY.xy(gx, gy), enemies: [...f(0, 0, 3, 200), ...f(gx, gy, 20, 320)]
-    }
-  },
-  /* 23 */ () => {
     const gx = -800
     const gy = 0
     const n = 8
@@ -374,7 +364,7 @@ export const stages: (() => stage_t)[] = [
       })
     }
   },
-  /* 24 */ () => {
+  /* 23 */ () => {
     const gx = 800
     const gy = 0
     const n = 8
@@ -386,5 +376,22 @@ export const stages: (() => stage_t)[] = [
         return e6(XY.xy((ix - 0.5) * 410, (iy + (iy < 0 ? -1 : 1)) * 80), 0, 0, 0.5)
       })
     }
+  },
+  /* 24 */ () => {
+    const gx = 800
+    const gy = 0
+    const f1 = (n: number, x: number, g: number) => [...range(0, n)].map(i => {
+      const c = (n - 1) / 2
+      const iy = i - c
+      return e6(XY.xy(x, (iy + (iy < 0 ? -1 : 1)) * g), 0, 0, 0.5)
+    })
+    const a = 190
+    const f: enemy_t[] = [
+      e1(XY.xy(0, 300), 300, a, 0.6),
+      e1(XY.xy(0, -300), -300, a, 0.6),
+      e1(XY.xy(0, 300), 300, a - 50, 0.6),
+      e1(XY.xy(0, -300), -300, a - 50, 0.6),
+    ]
+    return { goal: XY.xy(gx, gy), enemies: [...f1(4, 200, 80), ...f1(4, -200, 80), ...f] }
   },
 ];
