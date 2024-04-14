@@ -51,6 +51,7 @@ export class Main extends BaseScene {
   cursorInput: Phaser.Types.Input.Keyboard.CursorKeys | null = null
   objIDs: Set<string> = new Set<string>();
   cleared: boolean = false
+  stageTitle: string = ""
 
   init() {
     this.started = false
@@ -152,6 +153,7 @@ export class Main extends BaseScene {
     console.log(data);
     const { width, height } = this.canvas();
     this.init()
+    this.stageTitle = stages[data.stage]().title || `Stage ${data.stage}`
     this.world.init(data.stage)
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
     const starLayerCount = 6
@@ -440,6 +442,25 @@ export class Main extends BaseScene {
     z.setInteractive()
     z.on("pointerdown", () => { this.scene.start('Main') })
   }
+  addCenterText(msg: string, y: number, yorigin: number, style: Phaser.Types.GameObjects.Text.TextStyle): Phaser.GameObjects.Text {
+    const { width, height } = this.canvas()
+    const t = this.add.text(width * 0.5, y, msg, {
+      fontFamily: "serif",
+      fontStyle: "Bold",
+      align: "center",
+      lineSpacing: 15,
+      fontSize: 40,
+      ...style
+    }).setDepth(depth.text).setOrigin(0.5, yorigin).setShadow(3, 3, "black")
+    const maxW = width * 0.95
+    if (maxW < t.width) {
+      t.setScale(maxW / t.width)
+    }
+    return t
+  }
+  showStageName(msg: string) {
+    this.addCenterText(msg, 100, 0.5, {})
+  }
   endGameUI() {
     this.gotoTitleUI()
     this.retryUI()
@@ -466,6 +487,7 @@ export class Main extends BaseScene {
       }
     }
     this.endGameUI()
+    this.showStageName(`${this.stageTitle}...`)
   }
 
   showWelcomeBack() {
@@ -476,12 +498,9 @@ export class Main extends BaseScene {
       fontSize: 60,
     }).setDepth(depth.text).setOrigin(0.5, 0.5).setShadow(3, 3, "black")
     const wbB = wb.getBounds()
-    this.add.text(width * 0.5, wbB.top - 100, `Score: ${this.world.score}pts.`, {
-      fontFamily: "serif",
-      fontStyle: "Bold",
-      fontSize: 40,
-    }).setDepth(depth.text).setOrigin(0.5, 1).setShadow(3, 3, "black")
+    this.addCenterText(`Score: ${this.world.score}pts.`, wbB.top - 100, 1, {})
     this.endGameUI()
+    this.showStageName(`${this.stageTitle} cleared!`)
   }
   update() {
     if (this.cleared || this.world.isGameOver) {
