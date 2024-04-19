@@ -394,4 +394,26 @@ export const stages: (() => stage_t)[] = [
     ]
     return { goal: XY.xy(gx, gy), enemies: [...f1(4, 200, 80), ...f1(4, -200, 80), ...f] }
   },
+  /* 25 */ () => {
+    const gx = -580
+    const gy = 0
+    const f1 = (n: number, rad: number) => [...range(0, n)].map(i => {
+      return e6(XY.xy(gx, gy), rad, 360 / n * i, 0.5)
+    })
+    return { goal: XY.xy(gx, gy), enemies: [...f1(20, 300)] }
+  },
+  /* 26 */ () => {
+    const gx = -520
+    const gy = 0
+    const f1 = (n: number, rad: number) => [...range(0, n)].map(i => {
+      return e6(XY.xy(gx, gy), rad, 360 / n * i, 0.5)
+    })
+    const f2 = (s: number) => e1(XY.xy(0, s * 200), 200, 0, s * 0.5)
+    return {
+      goal: XY.xy(gx, gy), enemies: [
+        f2(1), f2(-1),
+        ...f1(20, 300)
+      ]
+    }
+  },
 ];
