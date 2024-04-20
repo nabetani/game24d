@@ -470,7 +470,7 @@ export const stages: (() => stage_t)[] = [
       ]
     }
   },
-  /* 31 [TBD] */ () => {
+  /* 31 */ () => {
     const gx = 0
     const gy = 1500
     const f1 = (n: number, x: number, y: number, r: number, f: number) => [...range(0, n)].map(
@@ -478,25 +478,27 @@ export const stages: (() => stage_t)[] = [
     )
     return {
       goal: XY.xy(gx, gy), enemies: [
-        ...f1(10, gx, gy, 300, 1),
-        ...f1(12, gx, gy, 350, -1.2),
-        ...f1(14, gx, gy, 400, 1.4),
-        ...f1(16, gx, gy, 450, -1.6),
+        ...f1(7, gx, gy, 300, 1),
+        ...f1(10, gx, gy, 350, -1.2),
+        ...f1(12, gx, gy, 400, 1.4),
+        ...f1(14, gx, gy, 450, -1.6),
       ]
     }
   },
-  /* 32 [TBD] */ () => {
+  /* 32 */ () => {
     const gx = 0
-    const gy = 1500
+    const gy = 2000
     const f1 = (n: number, x: number, y: number, r: number, f: number) => [...range(0, n)].map(
       i => e6(XY.xy(x, y), r, 360 / n * (i + 0.5), f)
     )
     return {
+      title: "Final Stage",
       goal: XY.xy(gx, gy), enemies: [
         ...f1(10, gx, gy, 300, 1),
         ...f1(12, gx, gy, 350, -1.2),
         ...f1(14, gx, gy, 400, 1.4),
         ...f1(16, gx, gy, 450, -1.6),
+        ...[...range(0, 8)].map(i => e6(XY.xy(0, i * 200 + 200), 0, 0, 0))
       ]
     }
   },
