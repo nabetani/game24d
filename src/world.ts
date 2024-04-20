@@ -227,9 +227,12 @@ export class World {
     return Math.min(1, (this.gunCharge[gunId] ?? 0))
   }
   fire(gunId: integer) {
-    this.firedCount++
     const ch = this.charged(gunId)
     this.gunCharge[gunId] = null
+    if (ch < 1 / 16) {
+      return
+    }
+    this.firedCount++
     const b = new Bullet(ch)
     b.p = this.player.p.dup()
     b.vr = 6
