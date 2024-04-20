@@ -52,6 +52,7 @@ export class Main extends BaseScene {
   objIDs: Set<string> = new Set<string>();
   cleared: boolean = false
   stageTitle: string = ""
+  enemyTotal: number = 0
 
   init() {
     this.started = false
@@ -130,8 +131,8 @@ export class Main extends BaseScene {
     const rB = numT("100.0", "tick.text", ruB)
     const fuB = fixed("発", rB)
     const fB = numT("1000", "fire.text", fuB)
-    const kuB = fixed("殺", fB)
-    const kB = numT("100", "kill.text", kuB)
+    const kB = numT("99/99", "kill.text", fB)
+    fixed("残敵", kB)
     const { width, height } = this.canvas()
     if (stageMsg) {
       const o = this.add.text(width / 2, height / 4,
@@ -153,7 +154,9 @@ export class Main extends BaseScene {
     console.log(data);
     const { width, height } = this.canvas();
     this.init()
-    this.stageTitle = stages[data.stage]().title || `Stage ${data.stage}`
+    const stage = stages[data.stage]()
+    this.enemyTotal = stage.enemies.length
+    this.stageTitle = stage.title || `Stage ${data.stage}`
     this.world.init(data.stage)
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
     const starLayerCount = 6
@@ -161,7 +164,7 @@ export class Main extends BaseScene {
       const o = this.add.image(0, 0, `bg${0 | (ix / 9)}`)
       this.bgs.push(o)
     }
-    this.addTexts(stages[data.stage]().msg)
+    this.addTexts(stage.msg)
     this.add.sprite(width / 2, height / 2, "player").setDepth(depth.player).setScale(0.25).setName("player");
     this.add.graphics().setName("pbone").setDepth(depth.player + 1)
     this.add.graphics().setName("charge").setDepth(depth.player)
@@ -374,7 +377,7 @@ export class Main extends BaseScene {
     this.textByName("dist.text").setText(stringizeNumber(this.dispDist()));
     this.textByName("tick.text").setText(stringizeNumber(this.world.restTick));
     this.textByName("fire.text").setText(`${this.world.firedCount}`)
-    this.textByName("kill.text").setText(`${this.world.killCount}`)
+    this.textByName("kill.text").setText(`${this.enemyTotal - this.world.killCount}/${this.enemyTotal}`)
   }
   upudatePlayer() {
     const { width, height } = this.canvas();
