@@ -386,12 +386,13 @@ export const stages: (() => stage_t)[] = [
       return e6(XY.xy(x, (iy + (iy < 0 ? -1 : 1)) * g), 0, 0, 0.5)
     })
     const a = 70
+    const b = a + 40
     const r = 300
     const f: enemy_t[] = [
-      e1(XY.xy(0, r), r, -90 + -a, 0.4),
-      e1(XY.xy(0, r), r, -90 + a, -0.4),
-      // e1(XY.xy(0, 300), 300, a - 50, 0.6),
-      // e1(XY.xy(0, 300), 300, a - 50, 0.6),
+      e1(XY.xy(0, r), r, -90 + -a, 0.45),
+      e1(XY.xy(0, r), r, -90 + a, -0.45),
+      e1(XY.xy(0, r), r, -90 + -b, 0.45),
+      e1(XY.xy(0, r), r, -90 + b, -0.45),
     ]
     return { goal: XY.xy(gx, gy), enemies: [...f1(4, 200, 80), ...f1(4, -200, 80), ...f] }
   },
