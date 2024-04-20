@@ -200,8 +200,9 @@ export class World {
     return this.player.killed || this.restTick <= 0
   }
   get score(): integer {
-    const fireScore = Math.floor(Math.sqrt(this.firedCount) * 40)
-    return 1000 + Math.round(this.restTick * 10) + (this.killCount * 100) - fireScore
+    const fireScore = [0, 2000, 1500, 1000][`${this.firedCount}`.length] ?? 500
+    const killAllScore = this.enemies.size == 0 ? 2000 : 0
+    return Math.round(this.restTick * 10) + (this.killCount * 100) + killAllScore + fireScore
   }
   update(dt: number, slc: number) {
     if (this.isGameOver) {
