@@ -13,6 +13,8 @@ const depth = {
 type Rectangle = Phaser.Geom.Rectangle
 const Rectangle = Phaser.Geom.Rectangle
 
+type longTextItem = string | { s: number, t: string[] }
+
 export class Title extends BaseScene {
   constructor() {
     super("Title")
@@ -92,29 +94,57 @@ export class Title extends BaseScene {
       WS.soundOn.write(on)
     }
   }
+  longTexts() {
+    const y = 100
+    const h = 40
+    const w = 130
+    this.addTextButton(new Rectangle(20, y, w, h), depth.textUI, "ストーリー", () => this.showLongText(
+      y, [
+      {
+        s: 2, t: [
+          "「メインエンジン大破、切り離します!」",
+          "「姿勢制御エンジンも操作不能!」",
+          "「生命維持装置にも支障、持ってあと100秒です。」",
+          "「艦長……", "　母星まであと僅かだというのに……」",
+          "",]
+      },
+      { s: 1, t: ["「主砲は撃てるか?」"] },
+      { s: 2, t: ["", "「……え?」"] },
+      { s: 1, t: ["", "「主砲は撃てるかときいている」"] },
+      { s: 2, t: ["", "「……はい。主砲は健在です。", "　エネルギーも十分にあります……」"] },
+      {
+        s: 1, t: [
+          "",
+          "「ならば主砲の反動で母星を目指す。",
+          "　我々は諦めない。　生きて母星に帰るぞ！」"]
+      },
+    ]
+    ))
+    this.addTextButton(new Rectangle(256 - w / 2, y, w, h), depth.textUI, "遊び方", () => this.showLongText(
+      y, [
+      "画面右半分を触るか、矢印キー右を押下で",
+      "右タイツ砲チャージ開始。",
+      "触るのをやめる、あるいは矢印キー押下やめると",
+      "右タイツ砲発射です。",
+      "チャージが不十分だと弾が出ません。",
+      "左も同様です。",
+      "左右同時チャージ、一方だけ発射なども可能です。",
+      "発射すると反動で加速します。回転速度も変わります。",
+      "チャージする・発射する 以外の操作はありません。",
+      "制限時間内に母星に到着してください。",
+      "敵に触れるか、時間切れでゲームオーバーです。",
+      "",
+      "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
+      "あります。苦手な方は遊ばないことをおすすめします。",
+    ]
+    ))
+  }
   create() {
     this.addSoundOnOff()
     this.setSoundOn(WS.soundOn.value)
     this.addStarts();
     this.addLinks();
-    this.addTextButton(new Rectangle(100, 100, 100, 40), depth.textUI, "遊び方", () => this.showLongText(
-      [
-        "画面右半分を触るか、矢印キー右を押下で",
-        "右タイツ砲チャージ開始。",
-        "触るのをやめる、あるいは矢印キー押下やめると",
-        "右タイツ砲発射です。",
-        "チャージが不十分だと弾が出ません。",
-        "左も同様です。",
-        "左右同時チャージ、一方だけ発射なども可能です。",
-        "発射すると反動で加速します。回転速度も変わります。",
-        "チャージする・発射する 以外の操作はありません。",
-        "制限時間内に母星に到着してください。",
-        "敵に触れるか、時間切れでゲームオーバーです。",
-        "",
-        "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
-        "あります。苦手な方は遊ばないことをおすすめします。",
-      ].join("\n")
-    ))
+    this.longTexts()
   }
   addLinks() {
     const tag = "宇宙巡洋艦タイツ";
@@ -171,30 +201,46 @@ export class Title extends BaseScene {
       this.add.image(width / 2, height / 2, "title");
     }
   }
-  showLongText(msg: string) {
+  showLongText(y0: number, items: longTextItem[]) {
     const { width, height } = this.canvas();
+    let y = y0
     let ruleObjs: Phaser.GameObjects.GameObject[] = [];
-    const rule = this.add.text(width / 2, height / 2, msg,
-      {
-        wordWrap: { width: width * 0.9, useAdvancedWrap: true },
-        padding: { x: 20, y: 20 },
-        lineSpacing: 10,
-        fontSize: "18px",
-        fontFamily: "sans-serif",
-        fixedWidth: width * 0.95,
-        backgroundColor: "#333",
-        color: "white",
+    let bounds: Rectangle | null = null
+    const addLine = (msg: string, style: number) => {
+      const rule = this.add.text(width / 2, y, msg,
+        {
+          wordWrap: { width: width * 0.9, useAdvancedWrap: true },
+          fontSize: "18px",
+          fontFamily: "sans-serif",
+          fixedWidth: width * 0.95,
+          backgroundColor: "#222",
+          color: ["#fff", "#ccf", "#ffa"][style],
+          padding: { x: 5, y: 7 },
+        }
+      )
+      rule.setDepth(depth.longText)
+      rule.setOrigin(0.5, 0)
+      ruleObjs.push(rule);
+      const b = rule.getBounds()
+      y = b.bottom
+      bounds = Rectangle.Union(rule.getBounds(), bounds ?? b)
+    }
+    for (const item of items) {
+      if ("string" === typeof (item)) {
+        addLine(item, 0)
+      } else {
+        for (const e of item.t) {
+          addLine(e, item.s)
+        }
       }
-    )
-    rule.setDepth(depth.longText)
-    rule.setOrigin(0.5, 0.5)
-    rule.on("pointerdown", () => {
-      for (const r of ruleObjs) {
-        r.destroy();
-      }
-    }).setInteractive()
-    ruleObjs.push(rule);
-    ruleObjs.push(...this.addCloseBox(rule.getBounds(), rule.depth + 1));
+    }
+    ruleObjs.push(...this.addCloseBox(bounds!, depth.longText + 1));
+    ruleObjs.push(this.add.zone(bounds!.x, bounds!.y, bounds!.width, bounds!.height).on(
+      "pointerdown", () => {
+        for (const r of ruleObjs) {
+          r.destroy();
+        }
+      }).setInteractive().setDepth(depth.longText + 2).setOrigin(0, 0))
   }
   addCloseBox(rc: Phaser.Geom.Rectangle, d: number): Phaser.GameObjects.GameObject[] {
     let objs = [];
