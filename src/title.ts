@@ -8,6 +8,7 @@ const depth = {
   bg: 0,
   button: 100,
   textUI: 200,
+  longText: 1000,
 }
 type Rectangle = Phaser.Geom.Rectangle
 const Rectangle = Phaser.Geom.Rectangle
@@ -19,7 +20,7 @@ export class Title extends BaseScene {
   preload() {
     this.load.image("title", `assets/title.webp`);
   }
-  addTextButton(rc: Rectangle, depth: number, texts: string[]): Phaser.GameObjects.Graphics {
+  addStartButton(rc: Rectangle, depth: number, texts: string[]): Phaser.GameObjects.Graphics {
     const fit = (t: Phaser.GameObjects.Text, w: number, h: number) => {
       const s = Math.min(w / t.width, h / t.height)
       t.setScale(s)
@@ -27,7 +28,7 @@ export class Title extends BaseScene {
 
     const t0 = this.add.text(rc.centerX, rc.top, texts[0], {
       fontSize: rc.height / 2,
-      fontFamily: "sasn-serif",
+      fontFamily: "sans-serif",
       padding: { x: 4, y: 4 }
     });
     t0.setOrigin(0.5, 0)
@@ -35,6 +36,7 @@ export class Title extends BaseScene {
     t0.setDepth(depth + 1)
     if (texts[1] != "") {
       const t1 = this.add.text(rc.centerX, rc.bottom, texts[1], {
+        fontFamily: "sans-serif",
         fontSize: rc.height / 2,
         padding: { x: 4, y: 4 }
       });
@@ -74,7 +76,7 @@ export class Title extends BaseScene {
           return `score: ${s}`
         })(sr[stage]?.score)
         const rc = new Rectangle(x, y, w, h)
-        const t = this.addTextButton(rc, depth.button, [title, score]);
+        const t = this.addStartButton(rc, depth.button, [title, score]);
         t.on("pointerdown", () => {
           this.scene.start('Main', { stage: stage });
         });
@@ -95,6 +97,24 @@ export class Title extends BaseScene {
     this.setSoundOn(WS.soundOn.value)
     this.addStarts();
     this.addLinks();
+    this.addTextButton(new Rectangle(100, 100, 100, 40), depth.textUI, "遊び方", () => this.showLongText(
+      [
+        "画面右半分を触るか、矢印キー右を押下で",
+        "右タイツ砲チャージ開始。",
+        "触るのをやめる、あるいは矢印キー押下やめると",
+        "右タイツ砲発射です。",
+        "チャージが不十分だと弾が出ません。",
+        "左も同様です。",
+        "左右同時チャージ、一方だけ発射なども可能です。",
+        "発射すると反動で加速します。回転速度も変わります。",
+        "チャージする・発射する 以外の操作はありません。",
+        "制限時間内に母星に到着してください。",
+        "敵に触れるか、時間切れでゲームオーバーです。",
+        "",
+        "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
+        "あります。苦手な方は遊ばないことをおすすめします。",
+      ].join("\n")
+    ))
   }
   addLinks() {
     const tag = "宇宙巡洋艦タイツ";
@@ -136,6 +156,7 @@ export class Title extends BaseScene {
         0, 25,
         ['Sound OFF', 'Sound ON'][i],
         {
+          fontFamily: "sans-serif",
           fontSize: 28,
           padding: { x: 5, y: 5 },
         }
@@ -150,4 +171,72 @@ export class Title extends BaseScene {
       this.add.image(width / 2, height / 2, "title");
     }
   }
+  showLongText(msg: string) {
+    const { width, height } = this.canvas();
+    let ruleObjs: Phaser.GameObjects.GameObject[] = [];
+    const rule = this.add.text(width / 2, height / 2, msg,
+      {
+        wordWrap: { width: width * 0.9, useAdvancedWrap: true },
+        padding: { x: 20, y: 20 },
+        lineSpacing: 10,
+        fontSize: "18px",
+        fontFamily: "sans-serif",
+        fixedWidth: width * 0.95,
+        backgroundColor: "#333",
+        color: "white",
+      }
+    )
+    rule.setDepth(depth.longText)
+    rule.setOrigin(0.5, 0.5)
+    rule.on("pointerdown", () => {
+      for (const r of ruleObjs) {
+        r.destroy();
+      }
+    }).setInteractive()
+    ruleObjs.push(rule);
+    ruleObjs.push(...this.addCloseBox(rule.getBounds(), rule.depth + 1));
+  }
+  addCloseBox(rc: Phaser.Geom.Rectangle, d: number): Phaser.GameObjects.GameObject[] {
+    let objs = [];
+    const { width, height } = this.sys.game.canvas
+    const w = width / 15;
+    const h = w;
+    const x = rc.right - w / 2;
+    const y = rc.top + h / 2;
+    objs.push(this.add.rectangle(x, y, w, h, 0, 1).setDepth(d));
+    for (const i of [45, -45]) {
+      const r = this.add.rectangle(x, y, w / 7, h * 0.9, 0xff0000, 1);
+      r.setDepth(d)
+      r.setAngle(i);
+      objs.push(r);
+    }
+    return objs;
+  }
+  addTextButton(rc: Rectangle, depth: number, text: string, proc: Function): Phaser.GameObjects.Graphics {
+    const fit = (t: Phaser.GameObjects.Text, w: number, h: number) => {
+      const s = Math.min(w / t.width, h / t.height)
+      t.setScale(s)
+    }
+    const t0 = this.add.text(rc.centerX, rc.centerY, text, {
+      fontSize: rc.height / 2,
+      fontFamily: "sans-serif",
+      padding: { x: 4, y: 4 }
+    });
+    t0.setOrigin(0.5, 0.5)
+    fit(t0, rc.width, rc.height)
+    t0.setDepth(depth + 1)
+    const g = this.add.graphics()
+    g.fillStyle(0, 0.5)
+    g.lineStyle(3, 0, 1)
+    const args = [rc.left, rc.top, rc.width, rc.height] as const
+    g.fillRect(...args)
+    g.strokeRect(...args)
+    g.setDepth(depth)
+    g.setInteractive(rc, (rc: Rectangle, x: number, y: number): boolean => {
+      return rc.contains(x, y);
+    });
+    g.on("pointerdown", proc)
+    return g
+  }
+
 }
