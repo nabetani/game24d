@@ -82,6 +82,7 @@ export class Main extends BaseScene {
     for (const d of range(0, 6)) {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
+    this.load.image("share", "assets/share.webp");
     this.load.image("player", "assets/player.webp");
     this.load.image("goal", "assets/goal.webp");
     this.load.image("arrowD", "assets/arrowD.webp");
@@ -473,6 +474,21 @@ export class Main extends BaseScene {
   endGameUI() {
     this.gotoTitleUI()
     this.retryUI()
+    const share = this.add.image(256, 800, "share")
+    const text = [
+      `#宇宙巡洋艦タイツ - ${this.stageTitle}: ${this.world.score} pts.`,
+      "https://nabetani.sakura.ne.jp/game24d/",
+    ].join("\n");
+
+    share.on('pointerdown', () => {
+      const encoded = encodeURIComponent(text);
+      const url = "https://taittsuu.com/share?text=" + encoded;
+      if (!window.open(url)) {
+        location.href = url;
+      }
+    }).setInteractive();
+    share.setInteractive()
+    share.setDepth(depth.text).setScale(0.5);
   }
 
   showGameOver() {
@@ -536,8 +552,10 @@ export class Main extends BaseScene {
       if (this.cleared) {
         this.showWelcomeBack()
         const sr = WS.stageResults.value
-        sr[this.stageNumber] = { score: this.world.score }
-        WS.stageResults.write(sr)
+        if ((sr[this.stageNumber]?.score ?? -1) < this.world.score) {
+          sr[this.stageNumber] = { score: this.world.score }
+          WS.stageResults.write(sr)
+        }
       }
       if (this.world.isGameOver) {
         this.showGameOver()
