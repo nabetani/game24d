@@ -28,8 +28,9 @@ export class Title extends BaseScene {
     g.fillStyle(0, 0.5)
     g.lineStyle(3, 0, 1)
     const rc = new Phaser.Geom.Rectangle(x - w / 2, y - t.height / 2, w, t.height)
-    const args = [rc.left, rc.top, rc.width, rc.height, t.height / 10] as const
-    g.fillRect(rc.left, rc.top, rc.width, rc.height)
+    const args = [rc.left, rc.top, rc.width, rc.height] as const
+    g.fillRect(...args)
+    g.strokeRect(...args)
     g.setDepth(depth)
     g.setInteractive(rc, (rc: Phaser.Geom.Rectangle, x: number, y: number): boolean => {
       return rc.contains(x, y);
@@ -52,21 +53,33 @@ export class Title extends BaseScene {
   }
   create() {
     const setSoundOn = (on: boolean) => {
-      this.textByName("soundOn.text").setScale(on ? 1 : 0.7);
-      this.textByName("soundOff.text").setScale(!on ? 1 : 0.7);
+      for (const i of range(0, 2)) {
+        const name = ["soundOFF.text", "soundON.text"][i]
+        const h = (on == (i != 0)) ? 35 : 25
+        const o = this.textByName(name)
+        o.setScale(h / o.height)
+        WS.soundOn.write(on)
+      }
     };
+    let x = 510
     for (const i of range(0, 2)) {
-      this.add.text(
-        [190, 370][i], 10,
-        ['Sound ON', 'SoundOff'][i],
+      const o = this.add.text(
+        0, 25,
+        ['Sound OFF', 'Sound ON'][i],
         {
-          fontSize: 35,
+          fontSize: 28,
+          padding: { x: 5, y: 5 },
         }
-      ).on("pointerdown", () => setSoundOn(i == 0)).setName(
-        ["soundOn.text", "soundOff.text"][i]
-      ).setDepth(depth.textUI).setInteractive()
-    const { width, height } = this.canvas();
-    this.add.image(width / 2, height / 2, "title");
+      )
+      o.on("pointerdown", () => setSoundOn(i != 0)).setName(
+        ["soundOFF.text", "soundON.text"][i]
+      )
+      o.setOrigin(0.5, 0.5).setDepth(depth.textUI).setInteractive()
+      o.setBackgroundColor("#0008")
+      o.x = x - o.width / 2
+      x = o.x - o.width / 2
+      const { width, height } = this.canvas();
+      this.add.image(width / 2, height / 2, "title");
     }
     setSoundOn(WS.soundOn.value)
     this.addStarts();
