@@ -3,6 +3,7 @@ import { BaseScene } from './baseScene';
 import { World, PlayerType } from './world';
 import { XY, sincos, clamp, range } from './calc'
 import { stages } from './stages';
+import * as WS from './wstorage'
 
 const getTickSec = (): number => {
   return (new Date().getTime()) * 1e-3
@@ -52,6 +53,8 @@ export class Main extends BaseScene {
   objIDs: Set<string> = new Set<string>();
   cleared: boolean = false
   stageTitle: string = ""
+  stageNumber: number = 0
+
   enemyTotal: number = 0
 
   init() {
@@ -156,6 +159,7 @@ export class Main extends BaseScene {
     this.init()
     const stage = stages[data.stage]()
     this.enemyTotal = stage.enemies.length
+    this.stageNumber = data.stage
     this.stageTitle = stage.title || `Stage ${data.stage}`
     this.world.init(data.stage)
     this.cursorInput = this.input?.keyboard?.createCursorKeys() ?? null
@@ -523,6 +527,8 @@ export class Main extends BaseScene {
       this.cleared = this.dispDist() <= 0
       if (this.cleared) {
         this.showWelcomeBack()
+        const sr = WS.stageResults.value
+        sr[this.stageNumber] = { score: this.world.score }
       }
       if (this.world.isGameOver) {
         this.showGameOver()

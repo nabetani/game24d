@@ -17,8 +17,8 @@ export class Title extends BaseScene {
   }
   addTextButton(x: number, y: number, w: number, depth: number,
     fontSize: number, padding: number,
-    text: string): Phaser.GameObjects.Graphics {
-    const t = this.add.text(x, y, text, {
+    texts: string[]): Phaser.GameObjects.Graphics {
+    const t = this.add.text(x, y, texts[0], {
       fontSize: fontSize,
       padding: { x: padding, y: padding }
     });
@@ -38,6 +38,7 @@ export class Title extends BaseScene {
     return g
   }
   addStarts() {
+    const sr = WS.stageResults.value
     const { width, height } = this.canvas();
     const col = 4;
     for (const stage of range(1, 33)) {
@@ -45,10 +46,12 @@ export class Title extends BaseScene {
       const x = ((i % col) / col + 0.5 / col) * width
       const y = Math.floor(i / col) * 55 + height / 2
       const depth = 1
-      const t = this.addTextButton(x, y, width / 4.5, depth, 20, 10, `Stage ${stage}`);
-      t.on("pointerdown", () => {
-        this.scene.start('Main', { stage: stage });
-      });
+      if (stage <= 4 || (stage - 1 < sr.length && sr[stage - 1].score != undefined)) {
+        const t = this.addTextButton(x, y, width / 4.5, depth, 20, 10, [`Stage ${stage}`]);
+        t.on("pointerdown", () => {
+          this.scene.start('Main', { stage: stage });
+        });
+      }
     }
   }
   setSoundOn(on: boolean) {
