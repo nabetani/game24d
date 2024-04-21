@@ -390,16 +390,18 @@ export class Main extends BaseScene {
     const h0 = 90
     for (const gunId of [0, 1]) {
       const ch = this.world.charged(gunId)
-      if (1 <= ch) {
-        graphics.fillStyle((0 == (this.updateCount & 4)) ? 0xff8888 : 0xffffff)
-      } else {
-        graphics.fillStyle(0xff0000)
-      }
+      const ccol = ((1 <= ch)
+        ? ((0 == (this.updateCount & 4)) ? 0xff8888 : 0xffffff)
+        : 0xff0000)
       const x = width / 2 + (gunId === 0 ? 1 : -1) * 50
-      const h = h0 * ch
-      const y = height / 2 + h0 / 2 - h
       const w = (gunId === 0 ? 1 : -1) * -15
-      graphics.fillRect(x, y, w, h);
+      const y0 = height / 2 + h0 / 2
+      const y1 = y0 - Math.min(ch, this.world.fireLimit) * h0
+      const y2 = y0 - ch * h0
+      graphics.fillStyle(0x8888ff)
+      graphics.fillRect(x, y1, w, y0 - y1)
+      graphics.fillStyle(ccol)
+      graphics.fillRect(x, y2, w, y1 - y2)
     }
   }
 

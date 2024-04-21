@@ -227,10 +227,11 @@ export class World {
   charged(gunId: integer): number {
     return Math.min(1, (this.gunCharge[gunId] ?? 0))
   }
+  get fireLimit(): integer { return 1 / 16 }
   fire(gunId: integer) {
     const ch = this.charged(gunId)
     this.gunCharge[gunId] = null
-    if (ch < 1 / 16) {
+    if (ch < this.fireLimit) {
       return
     }
     this.firedCount++
