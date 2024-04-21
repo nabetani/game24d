@@ -16,6 +16,7 @@ const Rectangle = Phaser.Geom.Rectangle
 type longTextItem = string | { s: number, t: string[] }
 
 export class Title extends BaseScene {
+  model: integer = 0
   constructor() {
     super("Title")
   }
@@ -80,6 +81,7 @@ export class Title extends BaseScene {
         const rc = new Rectangle(x, y, w, h)
         const t = this.addStartButton(rc, depth.button, [title, score]);
         t.on("pointerdown", () => {
+          if (this.model != 0) { return }
           this.scene.start('Main', { stage: stage });
         });
       }
@@ -182,6 +184,7 @@ export class Title extends BaseScene {
         padding: { x: 5, top: 6, bottom: 2 },
       })
       text.on("pointerdown", () => {
+        if (this.model != 0) { return }
         if (!window.open(e[1])) {
           location.href = e[1];
         }
@@ -207,7 +210,10 @@ export class Title extends BaseScene {
           padding: { x: 5, y: 5 },
         }
       )
-      o.on("pointerdown", () => this.setSoundOn(i != 0))
+      o.on("pointerdown", () => {
+        if (this.model != 0) { return }
+        this.setSoundOn(i != 0)
+      })
       o.setName(["soundOFF.text", "soundON.text"][i])
       o.setOrigin(0.5, 0.5).setDepth(depth.textUI).setInteractive()
       o.setBackgroundColor("#0008")
@@ -218,6 +224,8 @@ export class Title extends BaseScene {
     }
   }
   showLongText(y0: number, items: longTextItem[]) {
+    if (this.model != 0) { return }
+    ++this.model
     const { width, height } = this.canvas();
     let y = y0
     let ruleObjs: Phaser.GameObjects.GameObject[] = [];
@@ -256,6 +264,7 @@ export class Title extends BaseScene {
         for (const r of ruleObjs) {
           r.destroy();
         }
+        --this.model;
       }).setInteractive().setDepth(depth.longText + 2).setOrigin(0, 0))
   }
   addCloseBox(rc: Phaser.Geom.Rectangle, d: number): Phaser.GameObjects.GameObject[] {
