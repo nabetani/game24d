@@ -101,7 +101,7 @@ export class Title extends BaseScene {
     const y = 220
     const h = 40
     const w = 130
-    const ty = y + h + 10
+    const ty = y - 10
     this.addTextButton(new Rectangle(20, y, w, h), depth.textUI, "ストーリー", () => this.showLongText(
       ty, [
       {
@@ -137,6 +137,9 @@ export class Title extends BaseScene {
       "チャージする・発射する 以外の操作はありません。",
       "制限時間内に母星に到着してください。",
       "敵に触れるか、時間切れでゲームオーバーです。",
+      "",
+      "緑の太い矢印が母星の方向を示します。",
+      "赤い細い矢印は、進行方向を示します。",
       "",
       "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
       "あります。苦手な方は遊ばないことをおすすめします。",
