@@ -529,6 +529,7 @@ export class Main extends BaseScene {
         this.showWelcomeBack()
         const sr = WS.stageResults.value
         sr[this.stageNumber] = { score: this.world.score }
+        WS.stageResults.write(sr)
       }
       if (this.world.isGameOver) {
         this.showGameOver()
