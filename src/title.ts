@@ -292,15 +292,17 @@ export class Title extends BaseScene {
       t.setScale(s)
     }
     const t0 = this.add.text(rc.centerX, rc.centerY, text, {
-      fontSize: rc.height / 2,
+      fontSize: rc.height * 2,
       fontFamily: "sans-serif",
-      padding: { x: 4, y: 4 }
+      fontStyle: "bold",
+      padding: { x: 4, y: 4 },
+      color: "black"
     });
     t0.setOrigin(0.5, 0.5)
     fit(t0, rc.width, rc.height)
     t0.setDepth(depth + 1)
     const g = this.add.graphics()
-    g.fillStyle(0, 0.5)
+    g.fillStyle(0xffffff, 0.5)
     g.lineStyle(3, 0, 1)
     const args = [rc.left, rc.top, rc.width, rc.height] as const
     g.fillRect(...args)
