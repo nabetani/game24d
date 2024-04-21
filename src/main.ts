@@ -505,7 +505,13 @@ export class Main extends BaseScene {
       fontSize: 60,
     }).setDepth(depth.text).setOrigin(0.5, 0.5).setShadow(3, 3, "black")
     const wbB = wb.getBounds()
-    this.addCenterText(`Score: ${this.world.score}pts.`, wbB.top - 100, 1, {})
+    const st = this.addCenterText(`Score: ${this.world.score} pts.`, wbB.top - 150, 0, {})
+    const stB = st.getBounds()
+    const prevScore = WS.stageResults.value[this.stageNumber]?.score ?? -1
+    this.addCenterText(
+      prevScore < this.world.score ? "New Record!" : `Your best is ${prevScore} pts.`,
+      stB.bottom + 10, 0, { fontSize: 25 })
+
     this.endGameUI()
     this.showStageName(`${this.stageTitle} cleared!`)
   }
