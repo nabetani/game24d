@@ -51,16 +51,21 @@ export class Title extends BaseScene {
       });
     }
   }
+  setSoundOn(on: boolean) {
+    for (const i of range(0, 2)) {
+      const name = ["soundOFF.text", "soundON.text"][i]
+      const h = (on == (i != 0)) ? 35 : 25
+      const o = this.textByName(name)
+      o.setScale(h / o.height)
+      WS.soundOn.write(on)
+    }
+  }
   create() {
-    const setSoundOn = (on: boolean) => {
-      for (const i of range(0, 2)) {
-        const name = ["soundOFF.text", "soundON.text"][i]
-        const h = (on == (i != 0)) ? 35 : 25
-        const o = this.textByName(name)
-        o.setScale(h / o.height)
-        WS.soundOn.write(on)
-      }
-    };
+    this.addSoundOnOff()
+    this.setSoundOn(WS.soundOn.value)
+    this.addStarts();
+  }
+  addSoundOnOff() {
     let x = 510
     for (const i of range(0, 2)) {
       const o = this.add.text(
@@ -71,9 +76,8 @@ export class Title extends BaseScene {
           padding: { x: 5, y: 5 },
         }
       )
-      o.on("pointerdown", () => setSoundOn(i != 0)).setName(
-        ["soundOFF.text", "soundON.text"][i]
-      )
+      o.on("pointerdown", () => this.setSoundOn(i != 0))
+      o.setName(["soundOFF.text", "soundON.text"][i])
       o.setOrigin(0.5, 0.5).setDepth(depth.textUI).setInteractive()
       o.setBackgroundColor("#0008")
       o.x = x - o.width / 2
@@ -81,7 +85,5 @@ export class Title extends BaseScene {
       const { width, height } = this.canvas();
       this.add.image(width / 2, height / 2, "title");
     }
-    setSoundOn(WS.soundOn.value)
-    this.addStarts();
   }
 }
