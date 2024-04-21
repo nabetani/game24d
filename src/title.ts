@@ -1,6 +1,12 @@
 import * as Phaser from 'phaser';
 import { BaseScene } from './baseScene';
 import { range } from './calc';
+import * as WS from './wstorage'
+
+const depth = {
+  bg: 0,
+  textUI: 100,
+}
 
 export class Title extends BaseScene {
   constructor() {
@@ -46,8 +52,24 @@ export class Title extends BaseScene {
     }
   }
   create() {
+    const setSoundOn = (on: boolean) => {
+      this.textByName("soundOn.text").setScale(on ? 1 : 0.7);
+      this.textByName("soundOff.text").setScale(!on ? 1 : 0.7);
+    };
+    for (const i of range(0, 2)) {
+      this.add.text(
+        [190, 370][i], 10,
+        ['Sound ON', 'SoundOff'][i],
+        {
+          fontSize: 35,
+        }
+      ).on("pointerdown", () => setSoundOn(i == 0)).setName(
+        ["soundOn.text", "soundOff.text"][i]
+      ).setDepth(depth.textUI).setInteractive()
     const { width, height } = this.canvas();
     this.add.image(width / 2, height / 2, "title");
+    }
+    setSoundOn(WS.soundOn.value)
     this.addStarts();
   }
 }
