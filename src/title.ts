@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { BaseScene } from './baseScene';
 import { range } from './calc';
 import * as WS from './wstorage'
+import { stages } from './stages';
 
 const depth = {
   bg: 0,
@@ -62,18 +63,18 @@ export class Title extends BaseScene {
     const w = width / col - 10
     for (const stage of range(1, 33)) {
       if (debug || (stage <= 4 || (stage - 1 < sr.length && sr[stage - 1].score != undefined))) {
+        const title = stages[stage]()?.title ?? `Stage ${stage}`
         const i = stage - 1
         const ix = i % col
         const iy = (i - ix) / col
         const x = width / col * (ix + 0.5) - w / 2
-        const y = height - (8 - iy) * (500 / 8)
-        const name = `Stage ${stage}`
+        const y = height - (8 - iy) * (500 / 8) - 100
         const score = ((s: number | undefined): string => {
           if (s == undefined) { return "" }
           return `score: ${s}`
         })(sr[stage]?.score)
         const rc = new Rectangle(x, y, w, h)
-        const t = this.addTextButton(rc, depth.button, [name, score]);
+        const t = this.addTextButton(rc, depth.button, [title, score]);
         t.on("pointerdown", () => {
           this.scene.start('Main', { stage: stage });
         });
@@ -93,6 +94,40 @@ export class Title extends BaseScene {
     this.addSoundOnOff()
     this.setSoundOn(WS.soundOn.value)
     this.addStarts();
+    this.addLinks();
+  }
+  addLinks() {
+    const tag = "宇宙巡洋艦タイツ";
+    let y = this.sys.game.canvas.height - 10;
+    const rightEnd = 500
+    let x = rightEnd;
+    [
+      ["タイッツー #" + tag, "https://taittsuu.com/search/taiitsus/hashtags?query=" + tag],
+      ["Source code and license", "https://github.com/nabetani/game24d/"],
+      ["Suzuri - Nabetani-T", "https://suzuri.jp/Nabetani-T"],
+      ["鍋谷武典 @ タイッツー", "https://taittsuu.com/users/nabetani"],
+      ["制作ノート", "https://nabetani.hatenadiary.com/entry/2024/04/game24d"],
+    ].forEach((e, ix) => {
+      const text = this.add.text(x, y, e[0], {
+        fontSize: 16,
+        fontFamily: "sans-serif",
+        backgroundColor: "#0008",
+
+        padding: { x: 5, top: 6, bottom: 2 },
+      })
+      text.on("pointerdown", () => {
+        if (!window.open(e[1])) {
+          location.href = e[1];
+        }
+      }).setInteractive();
+      text.setOrigin(1, 1);
+      if (text.getBounds().x < 10) {
+        x = rightEnd
+        y = text.getBounds().top - 5;
+        text.setPosition(x, y)
+      }
+      x = text.getBounds().x - 10
+    });
   }
   addSoundOnOff() {
     let x = 510
