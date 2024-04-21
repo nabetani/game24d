@@ -95,11 +95,13 @@ export class Title extends BaseScene {
     }
   }
   longTexts() {
-    const y = 100
+    const { width } = this.canvas()
+    const y = 220
     const h = 40
     const w = 130
+    const ty = y + h + 10
     this.addTextButton(new Rectangle(20, y, w, h), depth.textUI, "ストーリー", () => this.showLongText(
-      y, [
+      ty, [
       {
         s: 2, t: [
           "「メインエンジン大破、切り離します!」",
@@ -121,7 +123,7 @@ export class Title extends BaseScene {
     ]
     ))
     this.addTextButton(new Rectangle(256 - w / 2, y, w, h), depth.textUI, "遊び方", () => this.showLongText(
-      y, [
+      ty, [
       "画面右半分を触るか、矢印キー右を押下で",
       "右タイツ砲チャージ開始。",
       "触るのをやめる、あるいは矢印キー押下やめると",
@@ -136,8 +138,22 @@ export class Title extends BaseScene {
       "",
       "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
       "あります。苦手な方は遊ばないことをおすすめします。",
-    ]
-    ))
+    ]))
+    this.addTextButton(new Rectangle(width - w - 20, y, w, h), depth.textUI, "得点計算", () => this.showLongText(
+      ty, [
+      "スコアは、クリア点 + 破壊点 + 残り時間点 です。",
+      "",
+      "クリア点は、発射した弾数で決まります。",
+      " • 1〜9発: 2000点",
+      " • 10〜99発:  1500点",
+      " • 100〜999発:  1000点",
+      " • それ以上:  500点",
+      "",
+      "破壊点は、破壊した敵の数✕100点です。",
+      "全滅すると、さらに 2000点入ります。",
+      "",
+      "残り時間点 は、残り時間 0.1秒で 1点です。",
+    ]))
   }
   create() {
     this.addSoundOnOff()
