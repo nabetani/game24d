@@ -32,6 +32,18 @@ export class Mobj {
   }
 }
 
+const vrot = (seed: (number | XY | null)[]): number => {
+  let s = 0
+  seed.forEach((v, ix) => {
+    const e = ("number" === typeof (v)) ? v
+      : (null === v) ? 1
+        : v.x + v.y * (1 << 16)
+    s = (e * (ix + 1.1) + s * 1.2) % 8
+  })
+  s -= 4
+  return s < 0 ? -1 + s / 4 : 1 + s / 4
+}
+
 export class Bullet extends Mobj {
   _power: number
   constructor(power: number) {
@@ -134,13 +146,13 @@ export class World {
   init(stage: number) {
     const s = stages[stage]()
     s.enemies.forEach(
-      (ei) => {
+      (ei, ix) => {
         const e = new Enemy();
         e.im = ei.im
         e.p = ei.p
         e.r = ei.r
         e.v = ei.v
-        e.vr = ei.vr ?? 0
+        e.vr = ei.vr ?? vrot([e.p, e.r, e.v, ix])
         e.pvaProc = ei.pva || null
         this.enemies.add(e)
       }

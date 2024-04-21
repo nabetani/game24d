@@ -6,7 +6,7 @@ type enemy_t = { p: XY, v: XY, r: number, vr?: number, im: number, pva?: (p: XY,
 type stage_t = { msg?: string, goal: goal_t, enemies: enemy_t[], title?: string }
 
 const e0 = (pos: XY): enemy_t => {
-  return { p: pos, v: XY.xy(0, 0), r: 0, vr: 1, im: 0 }
+  return { p: pos, v: XY.xy(0, 0), r: 0, im: 0 }
 }
 
 const e1 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
@@ -19,12 +19,12 @@ const e1 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
     return { p: XY.xy(x, y) }
   }
   const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
-  return { p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 1, pva: move }
+  return { p: z.p!, v: XY.zero(), r: 0, im: 1, pva: move }
 }
 
 const e2 = (pos: XY, velo: XY, fric: number): enemy_t => {
   return {
-    p: pos, v: velo, r: 0, vr: 1, im: 2, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    p: pos, v: velo, r: 0, im: 2, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
       const a = p.subP(ep).subP(ev.mul(fric));
       const r = a.norm + 1e-3;
       return { a: a.mul(30 / r) }
@@ -35,7 +35,7 @@ const e2 = (pos: XY, velo: XY, fric: number): enemy_t => {
 const e3 = (pos: XY, velo: XY, fric: number): enemy_t => {
   const forget = 1 - 1 / 50
   return {
-    p: pos, v: velo, r: 0, vr: 1, im: 3, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    p: pos, v: velo, r: 0, im: 3, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
       const dir = p.subP(ep).atan2()
       return { v: XY.rt(fric, dir).addP(ev.mul(forget)) }
     }
@@ -46,7 +46,7 @@ const e4 = (pos: XY): enemy_t => {
   const th = 200
   const velo = 200
   return {
-    p: pos, v: XY.zero(), r: 0, vr: 1, im: 4, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    p: pos, v: XY.zero(), r: 0, im: 4, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
       const vec = p.subP(ep)
       if (th < vec.norm) {
         return { v: XY.zero() }
@@ -72,7 +72,7 @@ const e5 = (pos: XY, range: number, a: number, f: number): enemy_t => {
     return { p: XY.xy(x, y) }
   }
   const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
-  return { p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 5, pva: move }
+  return { p: z.p!, v: XY.zero(), r: 0, im: 5, pva: move }
 }
 
 const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
@@ -98,7 +98,7 @@ const e6 = (pos: XY, rad: number, a: number, f: number): enemy_t => {
   const z = move(XY.zero(), XY.zero(), XY.zero(), 0)
   let proc = move
   return {
-    p: z.p!, v: XY.zero(), r: 0, vr: 1, im: 6, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
+    p: z.p!, v: XY.zero(), r: 0, im: 6, pva: (p: XY, ep: XY, ev: XY, dt: number): pva => {
       const vec = p.subP(ep)
       if (vec.norm < th) {
         proc = chase
