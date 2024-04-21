@@ -29,8 +29,7 @@ export class Title extends BaseScene {
     g.lineStyle(3, 0, 1)
     const rc = new Phaser.Geom.Rectangle(x - w / 2, y - t.height / 2, w, t.height)
     const args = [rc.left, rc.top, rc.width, rc.height, t.height / 10] as const
-    g.fillRoundedRect(...args);
-    g.strokeRoundedRect(...args);
+    g.fillRect(rc.left, rc.top, rc.width, rc.height)
     g.setDepth(depth)
     g.setInteractive(rc, (rc: Phaser.Geom.Rectangle, x: number, y: number): boolean => {
       return rc.contains(x, y);
