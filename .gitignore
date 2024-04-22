@@ -132,3 +132,5 @@ dist
 
 **/.DS_Store
 materials/tmp.png
+materials/script/icon_*.ico
+materials/script/icon_*.png
