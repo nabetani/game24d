@@ -212,7 +212,8 @@ export class World {
     return this.player.killed || this.restTick <= 0
   }
   get score(): integer {
-    const fireScore = [0, 2000, 1500, 1000][`${this.firedCount}`.length] ?? 500
+    const lt = (th: number): number => (this.firedCount < th ? 1 : 0)
+    const fireScore = [750, 1000, 1250, 1500, 2000][lt(4) + lt(10) + lt(30) + lt(100)]
     const killAllScore = this.enemies.size == 0 ? 2000 : 0
     return Math.round(this.restTick * 10) + (this.killCount * 100) + killAllScore + fireScore
   }
