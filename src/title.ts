@@ -101,8 +101,8 @@ export class Title extends BaseScene {
     const y = 220
     const h = 40
     const w = 130
-    const ty = y - 10
-    this.addTextButton(new Rectangle(20, y, w, h), depth.textUI, "ストーリー", () => this.showLongText(
+    const ty = y - 40
+    this.addTextButton(new Rectangle(20, y, w, h), depth.textUI, "物語", () => this.showLongText(
       ty, [
       {
         s: 2, t: [
@@ -143,6 +143,8 @@ export class Title extends BaseScene {
       "",
       "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
       "あります。苦手な方は遊ばないことをおすすめします。",
+      "",
+      "ℹ️ 計算負荷に応じて星の数が減ります（仕様）。"
     ]))
     this.addTextButton(new Rectangle(width - w - 20, y, w, h), depth.textUI, "得点計算", () => this.showLongText(
       ty, [
@@ -177,7 +179,7 @@ export class Title extends BaseScene {
       ["Source code and license", "https://github.com/nabetani/game24d/"],
       ["Suzuri - Nabetani-T", "https://suzuri.jp/Nabetani-T"],
       ["鍋谷武典 @ タイッツー", "https://taittsuu.com/users/nabetani"],
-      ["制作ノート", "https://nabetani.hatenadiary.com/entry/2024/04/game24d"],
+      ["制作ノート", "https://nabetani.hatenadiary.com/entry/game24d"],
     ].forEach((e, ix) => {
       const text = this.add.text(x, y, e[0], {
         fontSize: 15,
@@ -242,7 +244,7 @@ export class Title extends BaseScene {
           fixedWidth: width * 0.95,
           backgroundColor: "#222",
           color: ["#fff", "#ccf", "#ffa"][style],
-          padding: { x: 5, y: 7 },
+          padding: { x: 5, y: 6 },
         }
       )
       rule.setDepth(depth.longText)
