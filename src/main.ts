@@ -78,10 +78,29 @@ export class Main extends BaseScene {
   constructor() {
     super("Main")
   }
+  get soundList() {
+    return ["bgm"]
+  }
+  loadSounds() {
+    if (!WS.soundOn.value) {
+      return
+    }
+    for (const n of this.soundList) {
+      this.load.audio(n, `assets/${n}.m4a`)
+    }
+  }
+  playSound(n: string, conf: Phaser.Types.Sound.SoundConfig = {}) {
+    if (!WS.soundOn.value) {
+      return
+    }
+    this.sound.get(n).play(conf)
+  }
   preload() {
     for (const d of range(0, 6)) {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
+    this.loadSounds()
+    this.load.audio("tbgm", "assets/tbgm.m4a");
     this.load.image("share", "assets/share.webp");
     this.load.image("player", "assets/player.webp");
     this.load.image("goal", "assets/goal.webp");
@@ -153,11 +172,16 @@ export class Main extends BaseScene {
       }
     }
   }
-
+  addSounds() {
+    for (const n of this.soundList) {
+      this.sound.add(n)
+    }
+  }
   create(data: { stage: number }) {
     console.log(data);
     const { width, height } = this.canvas();
     this.init()
+    this.addSounds()
     const stage = stages[data.stage]()
     this.enemyTotal = stage.enemies.length
     this.stageNumber = data.stage
@@ -176,6 +200,7 @@ export class Main extends BaseScene {
     this.add.sprite(width / 2, height / 2, "goal").setDepth(depth.goal).setScale(0.5).setName("goal");
     const inputDown = (ix: 1 | 0) => {
       if (!this.started) {
+        this.playSound("bgm", { volume: 0.25, loop: true });
         this.started = true
         const o = this.sys.displayList.getByName("stage.text")
         if (o) {
