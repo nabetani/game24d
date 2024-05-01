@@ -79,7 +79,7 @@ export class Main extends BaseScene {
     super("Main")
   }
   get soundList() {
-    return ["bgm"]
+    return ["bgm", "crush"]
   }
   loadSounds() {
     if (!WS.soundOn.value) {
@@ -94,6 +94,12 @@ export class Main extends BaseScene {
       return
     }
     this.sound.get(n).play(conf)
+  }
+  stopSound(n: string) {
+    if (!WS.soundOn.value) {
+      return
+    }
+    this.sound.get(n).stop()
   }
   preload() {
     for (const d of range(0, 6)) {
@@ -583,7 +589,9 @@ export class Main extends BaseScene {
         }
       }
       if (this.world.isGameOver) {
+        this.playSound("crush", { volume: 0.5, loop: false });
         this.showGameOver()
+        this.stopSound("bgm");
       }
     }
   }
