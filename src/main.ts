@@ -79,7 +79,7 @@ export class Main extends BaseScene {
     super("Main")
   }
   get soundList() {
-    return ["bgm", "crush"]
+    return ["bgm", "crush", "goal"]
   }
   loadSounds() {
     if (!WS.soundOn.value) {
@@ -581,6 +581,8 @@ export class Main extends BaseScene {
       this.prevTick += dtReal
       this.cleared = this.dispDist() <= 0
       if (this.cleared) {
+        this.playSound("goal", { volume: 0.5, loop: false });
+        this.stopSound("bgm");
         this.showWelcomeBack()
         const sr = WS.stageResults.value
         if ((sr[this.stageNumber]?.score ?? -1) < this.world.score) {
