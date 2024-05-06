@@ -83,7 +83,7 @@ export class Main extends BaseScene {
     fn: string;
   }, void, unknown> {
     const foo = function* () {
-      for (const n of ["bgm", "crush", "goal"]) {
+      for (const n of ["bgm", "crush", "goal", "gameend"]) {
         yield { name: n, fn: `assets/${n}.m4a` }
       }
       for (const n of ["chargeUp", "chargeKeep"]) {
@@ -475,7 +475,10 @@ export class Main extends BaseScene {
     ]
     const g = this.add.polygon(0, height, points, 0, 0.5).setOrigin(0, 1).setDepth(depth.textbase)
     g.setInteractive()
-    g.on("pointerdown", () => { this.scene.start('Title') })
+    g.on("pointerdown", () => {
+      this.sound.stopAll();
+      this.scene.start('Title')
+    })
   }
 
   retryUI() {
@@ -499,7 +502,10 @@ export class Main extends BaseScene {
     const g = this.add.polygon(width, height, points, 1, 0.5).setOrigin(0, 1).setDepth(depth.textbase)
     const z = this.add.zone(width - w, height - h, w, h).setOrigin(0, 0)
     z.setInteractive()
-    z.on("pointerdown", () => { this.scene.start('Main') })
+    z.on("pointerdown", () => {
+      this.sound.stopAll();
+      this.scene.start('Main')
+    })
   }
   addCenterText(msg: string, y: number, yorigin: number, style: Phaser.Types.GameObjects.Text.TextStyle): Phaser.GameObjects.Text {
     const { width, height } = this.canvas()
@@ -582,6 +588,10 @@ export class Main extends BaseScene {
     this.endGameUI()
     this.showStageName(`${this.stageTitle} cleared!`)
   }
+  switchBgm() {
+    this.stopSound("bgm");
+    this.playSound("gameend", { volume: 1 / 20, loop: true, delay: 1 });
+  }
   update() {
     if (this.cleared || this.world.isGameOver) {
     } else if (this.started) {
@@ -600,7 +610,7 @@ export class Main extends BaseScene {
       this.cleared = this.dispDist() <= 0
       if (this.cleared) {
         this.playSound("goal", { volume: 0.5, loop: false });
-        this.stopSound("bgm");
+        this.switchBgm()
         this.showWelcomeBack()
         const sr = WS.stageResults.value
         if ((sr[this.stageNumber]?.score ?? -1) < this.world.score) {
@@ -611,7 +621,7 @@ export class Main extends BaseScene {
       if (this.world.isGameOver) {
         this.playSound("crush", { volume: 0.5, loop: false });
         this.showGameOver()
-        this.stopSound("bgm");
+        this.switchBgm()
       }
     }
   }
