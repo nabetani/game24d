@@ -78,15 +78,28 @@ export class Main extends BaseScene {
   constructor() {
     super("Main")
   }
-  get soundList() {
-    return ["bgm", "crush", "goal"]
+  soundList(): () => Generator<{
+    name: string;
+    fn: string;
+  }, void, unknown> {
+    const foo = function* () {
+      for (const n of ["bgm", "crush", "goal"]) {
+        yield { name: n, fn: `assets/${n}.m4a` }
+      }
+      for (const n of ["chargeUp", "chargeKeep"]) {
+        yield { name: n + "0", fn: `assets/${n}.m4a` }
+        yield { name: n + "1", fn: `assets/${n}.m4a` }
+      }
+    }
+    return foo
   }
   loadSounds() {
     if (!WS.soundOn.value) {
       return
     }
-    for (const n of this.soundList) {
-      this.load.audio(n, `assets/${n}.m4a`)
+    for (const n of this.soundList()()) {
+      console.log({ load_audio: n })
+      this.load.audio(n.name, n.fn)
     }
   }
   playSound(n: string, conf: Phaser.Types.Sound.SoundConfig = {}) {
@@ -106,7 +119,7 @@ export class Main extends BaseScene {
       this.load.image(`bg${d}`, `assets/bg${d}.webp`);
     }
     this.loadSounds()
-    this.load.audio("tbgm", "assets/tbgm.m4a");
+    this.load.audio("bgm", "assets/bgm.m4a");
     this.load.image("share", "assets/share.webp");
     this.load.image("player", "assets/player.webp");
     this.load.image("goal", "assets/goal.webp");
@@ -179,8 +192,9 @@ export class Main extends BaseScene {
     }
   }
   addSounds() {
-    for (const n of this.soundList) {
-      this.sound.add(n)
+    for (const n of this.soundList()()) {
+      console.log({ sound_add: n })
+      this.sound.add(n.name)
     }
   }
   create(data: { stage: number }) {
@@ -215,10 +229,14 @@ export class Main extends BaseScene {
         }
       }
 
-      this.world.inputDown(ix)
+      if (this.world.inputDown(ix)) {
+        this.playSound(`chargeUp${ix}`)
+      }
     }
     const inputUp = (ix: 1 | 0) => {
-      this.world.inputUp(ix)
+      if (this.world.inputUp(ix)) {
+        this.stopSound(`chargeUp${ix}`)
+      }
     }
     {
       const kb = this.input!.keyboard!

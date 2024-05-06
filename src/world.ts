@@ -260,17 +260,19 @@ export class World {
     this.player.a.incByDir(this.player.r, -100 * (0.1 + 10 * b.power ** 2))
     this.bullets.push(b)
   }
-  inputDown(gunId: integer) {
+  inputDown(gunId: integer): boolean {
     if (this.player.killed) {
-      return
+      return false
     }
     this.startCharging(gunId)
+    return true
   }
-  inputUp(gunId: integer) {
+  inputUp(gunId: integer): boolean {
     if (this.player.killed) {
-      return
+      return false
     }
     this.fire(gunId)
+    return true
   }
 };
 
