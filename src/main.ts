@@ -86,9 +86,13 @@ export class Main extends BaseScene {
       for (const n of ["bgm", "crush", "goal", "gameend"]) {
         yield { name: n, fn: `assets/${n}.m4a` }
       }
-      for (const n of ["chargeUp", "chargeKeep"]) {
-        yield { name: n + "0", fn: `assets/${n}.m4a` }
-        yield { name: n + "1", fn: `assets/${n}.m4a` }
+      const list: [number, string][] = [
+        [2, "chargeUp"], [2, "chargeKeep"], [2, "fire"]
+      ]
+      for (const [count, n] of list) {
+        for (const ix of range(0, count)) {
+          yield { name: `${n}${ix}`, fn: `assets/${n}.m4a` }
+        }
       }
     }
     return foo
@@ -234,8 +238,9 @@ export class Main extends BaseScene {
       }
     }
     const inputUp = (ix: 1 | 0) => {
+      this.stopSound(`chargeUp${ix}`)
       if (this.world.inputUp(ix)) {
-        this.stopSound(`chargeUp${ix}`)
+        this.playSound(`fire${ix}`)
       }
     }
     {
