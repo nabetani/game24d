@@ -241,7 +241,7 @@ export class Main extends BaseScene {
       this.stopSound(`chargeUp${ix}`)
       const charge = this.world.inputUp(ix)
       if (charge != null) {
-        this.playSound(`fire${ix}`, { volume: 0.2 + 0.8 * charge, rate: 1 + 2 * (1 - charge) })
+        this.playSound(`fire${ix}`, { volume: 0.2 + 0.8 * charge, rate: 1 + 1 * (1 - charge) })
       }
     }
     {
