@@ -9,6 +9,8 @@ const getTickSec = (): number => {
   return (new Date().getTime()) * 1e-3
 }
 
+const killSoundCount = 16
+
 const depth = {
   bg: 0,
   stars: 10,
@@ -56,6 +58,7 @@ export class Main extends BaseScene {
   stageNumber: number = 0
 
   enemyTotal: number = 0
+  killSoundIx: { [key: string]: number } = {}
 
   init() {
     this.started = false
@@ -87,8 +90,8 @@ export class Main extends BaseScene {
         yield { name: n, fn: `assets/${n}.m4a` }
       }
       const list: [number, string][] = [
-        [2, "chargeUp"], [2, "chargeKeep"], [2, "fire"]
-      ]
+        [2, "chargeUp"], [2, "chargeKeep"], [2, "fire"],
+        ...Array.from(range(0, 7), (i): [number, string] => { return [killSoundCount, `e${i}`] })]
       for (const [count, n] of list) {
         for (const ix of range(0, count)) {
           yield { name: `${n}${ix}`, fn: `assets/${n}.m4a` }
@@ -610,7 +613,13 @@ export class Main extends BaseScene {
         this.starLayerCount = clamp(6 / 30 / dtMax, 1, this.starLayerCount)
       }
       console.log({ dtMaxInv: 1 / dtMax, dtHist: this.dtHist, dtinv: 1 / dt, starLayerCount: this.starLayerCount })
-      this.world.update(dt, this.starLayerCount)
+      const killeds = this.world.update(dt, this.starLayerCount)
+      for (const k of killeds) {
+        const n = `e${k}`
+        const ix = this.killSoundIx[n] || 0
+        this.killSoundIx[n] = (ix + 1) % killSoundCount
+        this.playSound(`${n}${ix}`)
+      }
       this.updateGameObjects()
       this.prevTick += dtReal
       this.cleared = this.dispDist() <= 0

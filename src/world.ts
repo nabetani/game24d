@@ -179,11 +179,12 @@ export class World {
     bro.v = e.v.dup()
   }
 
-  updateEnemies(dt: number, slc: number) {
+  updateEnemies(dt: number, slc: number): number[] {
     const enemies: Set<Enemy> = new Set<Enemy>()
+    let k: number[] = []
     this.enemies.forEach(e => {
       if (!e.isLiving) {
-        return;
+        return []
       }
       if (e.pvaProc) {
         const act = e.pvaProc(this.player.p, e.p, e.v, dt)
@@ -202,11 +203,13 @@ export class World {
           b.decPower()
           e.setKilled()
           this.killCount++;
+          k.push(e.im)
         }
       })
       enemies.add(e)
     })
     this.enemies = enemies
+    return k
   }
   get isGameOver(): boolean {
     return this.player.killed || this.restTick <= 0
@@ -217,9 +220,9 @@ export class World {
     const killAllScore = this.enemies.size == 0 ? 2000 : 0
     return Math.round(this.restTick * 10) + (this.killCount * 100) + killAllScore + fireScore
   }
-  update(dt: number, slc: number) {
+  update(dt: number, slc: number): number[] {
     if (this.isGameOver) {
-      return
+      return []
     }
     this.restTick -= dt
     // console.log({ player_a: this.player.a.norm, player_v: this.player.v.norm })
@@ -227,8 +230,9 @@ export class World {
     this.addCharge(0, dt)
     this.addCharge(1, dt)
     this.updateBullets(dt);
-    this.updateEnemies(dt, slc);
+    const k = this.updateEnemies(dt, slc);
     this.updateBrokens(dt);
+    return k
   }
   startCharging(gunId: integer) {
     this.gunCharge[gunId] = 0
