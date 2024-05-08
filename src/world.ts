@@ -241,11 +241,11 @@ export class World {
     return Math.min(1, (this.gunCharge[gunId] ?? 0))
   }
   get fireLimit(): integer { return 1 / 16 }
-  fire(gunId: integer): boolean {
+  fire(gunId: integer): number | null {
     const ch = this.charged(gunId)
     this.gunCharge[gunId] = null
     if (ch < this.fireLimit) {
-      return false
+      return null
     }
     this.firedCount++
     const b = new Bullet(ch)
@@ -259,7 +259,7 @@ export class World {
     this.player.ar += 3 * [1, -1][gunId] * (0.1 + b.power * 2)
     this.player.a.incByDir(this.player.r, -100 * (0.1 + 10 * b.power ** 2))
     this.bullets.push(b)
-    return true
+    return ch
   }
   inputDown(gunId: integer): boolean {
     if (this.player.killed) {
@@ -268,9 +268,9 @@ export class World {
     this.startCharging(gunId)
     return true
   }
-  inputUp(gunId: integer): boolean {
+  inputUp(gunId: integer): number | null {
     if (this.player.killed) {
-      return false
+      return null
     }
     return this.fire(gunId)
   }
