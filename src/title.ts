@@ -183,7 +183,7 @@ export class Title extends BaseScene {
       ["制作ノート", "https://nabetani.hatenadiary.com/entry/game24d"],
     ].forEach((e, ix) => {
       const text = this.add.text(x, y, e[0], {
-        fontSize: 15,
+        fontSize: 14,
         fontFamily: "sans-serif",
         backgroundColor: "#0008",
 
