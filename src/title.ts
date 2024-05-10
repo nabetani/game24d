@@ -177,8 +177,8 @@ export class Title extends BaseScene {
     let x = rightEnd;
     [
       ["タイッツー #" + tag, "https://taittsuu.com/search/taiitsus/hashtags?query=" + tag],
+      ["Suzuri - Nabetani-T - 宇宙巡洋艦", "https://suzuri.jp/Nabetani-T/designs/15802611"],
       ["Source code and license", "https://github.com/nabetani/game24d/"],
-      ["Suzuri - Nabetani-T", "https://suzuri.jp/Nabetani-T"],
       ["鍋谷武典 @ タイッツー", "https://taittsuu.com/users/nabetani"],
       ["制作ノート", "https://nabetani.hatenadiary.com/entry/game24d"],
     ].forEach((e, ix) => {
