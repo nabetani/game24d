@@ -90,7 +90,7 @@ export class Main extends BaseScene {
         yield { name: n, fn: `assets/${n}.m4a` }
       }
       const list: [number, string][] = [
-        [2, "chargeUp"], [2, "chargeKeep"], [2, "fire"],
+        [2, "chargeUp"], [2, "fire"],
         ...Array.from(range(0, 7), (i): [number, string] => { return [killSoundCount, `e${i}`] })]
       for (const [count, n] of list) {
         for (const ix of range(0, count)) {
