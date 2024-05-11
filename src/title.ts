@@ -144,7 +144,8 @@ export class Title extends BaseScene {
       "⚠️ 2Dのゲームですが、なぜか 3D酔いをする場合が",
       "あります。苦手な方は遊ばないことをおすすめします。",
       "",
-      "ℹ️ 計算負荷に応じて星の数が減ります（仕様）。"
+      "ℹ️ 計算負荷に応じて星の数が減ります（仕様）。",
+      "ℹ️ Sound OFF にすると処理が軽くなることがあります。"
     ]))
     this.addTextButton(new Rectangle(width - w - 20, y, w, h), depth.textUI, "得点計算", () => this.showLongText(
       ty, [
