@@ -199,6 +199,9 @@ export class Main extends BaseScene {
     }
   }
   addSounds() {
+    if (!WS.soundOn.value) {
+      return
+    }
     for (const n of this.soundList()()) {
       console.log({ sound_add: n })
       this.sound.add(n.name)
