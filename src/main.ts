@@ -538,12 +538,12 @@ export class Main extends BaseScene {
   showStageName(msg: string) {
     this.addCenterText(msg, 100, 0.5, {})
   }
-  endGameUI() {
+  endGameUI(result: string) {
     this.gotoTitleUI()
     this.retryUI()
     const share = this.add.image(256, 800, "share")
     const text = [
-      `#宇宙巡洋艦タイツ - ${this.stageTitle}: ${this.world.score} pts.`,
+      `#宇宙巡洋艦タイツ - ${this.stageTitle}: ${result}.`,
       "https://nabetani.sakura.ne.jp/game24d/",
     ].join("\n");
 
@@ -578,7 +578,7 @@ export class Main extends BaseScene {
         m.setScale(wmax / m.width)
       }
     }
-    this.endGameUI()
+    this.endGameUI(`残り ${stringizeNumber(this.dispDist())} 宇宙デニール`)
     this.showStageName(`${this.stageTitle}...`)
   }
 
@@ -597,7 +597,7 @@ export class Main extends BaseScene {
       prevScore < this.world.score ? "New Record!" : `Your best is ${prevScore} pts.`,
       stB.bottom + 10, 0, { fontSize: 25 })
 
-    this.endGameUI()
+    this.endGameUI(`${this.world.score} pts.`)
     this.showStageName(`${this.stageTitle} cleared!`)
   }
   switchBgm() {
